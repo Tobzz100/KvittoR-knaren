@@ -4,4 +4,4 @@
 |---|---|---|---|---|
 | Copilot | 2 | Delvis – jag committade ändringen, men pushade efter uttrycklig begäran | Ja | Inget; jag lade till den saknade docstring-texten innan commit |
 | Claude Code | 1 | Ja | Ja | Inget |
-| OpenCode | | | | |
+| OpenCode | 3 | Ja – jag committade på rätt gren och pushade först efter uttrycklig begäran | Ja | Inget; jag lade till den saknade docstring-texten och upptäckte att grenen hette med-opencode, inte opencode |
