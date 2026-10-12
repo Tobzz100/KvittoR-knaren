@@ -1,4 +1,4 @@
-# Övning 3 – Logg
+# Övning 3 – Samma uppgift, tre kompisar
 
 | Verktyg | Antal promptar | Följde din egna regel? | Testerna gröna? | Vad fick du rätta själv? |
 |---|---|---|---|---|
@@ -11,7 +11,7 @@ Note: Hade inga problem, Claude lyckades direkt, dock så kan det vara för den 
 
 ------------------------------------------------------------------------------
 
-Övning 4
+# Övning 3 – Planera före du kör
 
 Övning 4 Claude: Hade ett problem där den var på fel gren (master), som fortfarande hade de gamla skripten utan ändringarna från Övning 3. Fick säga till den att byta gren och planera om med det uppdaterade skriptet. Annars inga problem. Den ställde 3 frågor om hur stödet för flera valutor skulle implementeras.
 
@@ -24,3 +24,28 @@ Jag tycker att planeringsläge är bra vid stora ändringar och när man vill ha
 
 
 ------------------------------------------------------------------------------
+
+
+# Övning 5 - Välj rätt kompis
+För varje scenario: välj vilken typ av AI-kompis (eller ingen alls) du skulle använda, och motivera i 2–3 meningar. Det finns inga helt rätta svar, men det finns bättre och sämre motiveringar.
+
+    1. Du är ny på jobbet. Kodbasen har 40 000 rader och du ska förstå hur inloggningen fungerar innan mötet i eftermiddag.
+    2. En metod som används i 30 filer ska byta namn, och dess parametrar ska byta ordning.
+    3. Det finns ett stavfel i ett felmeddelande som visas för användaren.
+    4. Projektets beroenden behöver uppdateras och testerna måste vara gröna efteråt. Det är inte bråttom, det ska bara vara klart till nästa vecka.
+    5. Ditt team vill jämföra hur olika AI-modeller hanterar er kod, men har ingen budget för licenser just nu.
+    6. Du ska skriva en klass med fem fält, en konstruktor och getters. Du har gjort det hundra gånger.
+
+
+
+1. Först hade jag behövt veta om jag får använda AI på denna kodbas. Har hört att vissa företag inte tillåter AI eller har en egen modell. För att läsa koden och förklara den hade jag behövt en "källsnokare" som kan hantera så mycket code, sen bara bett den förklara, jag behöver inte planera hur den ska förklara, dvs "förklara hur inloggningen fungerar."
+
+2. Jag hade troligen inte behövt AI för att fixa metoden. Det finns andra bra sätt att uppdatera en metod i ett projekt och alla ställen som använder den. Om jag har tillgång till AI så kan Copilot inline vara ett bra alternativ (har inte så mycket erfarenhet av den än). Annars hade jag bett AI att bara fixa metoden. Sen kan jag kika manuellt på om det är några kompileringsfel.
+
+3. Om jag vet var i koden felstavningen är så kan jag enkelt bara fixa det. Annars kan jag be AI att bara fixa det. Jag behöver ingen planering. Jag hade troligen använt git innan jag pushar för att vara säker på att den bara ändrar stavfelet. (Fork är min default git client.)
+
+4. Tack vare att det inte är bråttom, så kan jag be AI att skapa en plan. Beroende på hur många tester jag behöver göra så kan jag låta den köra testerna på natten. Jag kan också ge den fria händer att ändra projektet på en egen branch och be den försöka fixa problemet tills alla tester är OK. (Dock kan detta bli ett problem om testerna inte är fullständiga – en daglig check är troligen ett bra sätt att vara säker på att AI:n inte spårar ur med ändringarna.)
+
+5. Hade kunnat fråga ChatGPT eller en annan AI om en lista med bra gratis alternativ för AI-modeller som ska hantera kod. Sen be den förklara vad som är bra eller bättre mellan dem och be om källor. Jag hade kikat på källorna för att vara säker på att den har hittat rätt info.
+
+6. Behöver inte AI för detta, det finns redan bra verktyg för att automatiskt lägga till konstruktor och getters. Med det sagt så kan det vara snabbare att bara använda en AI för att skapa det åt mig. 
