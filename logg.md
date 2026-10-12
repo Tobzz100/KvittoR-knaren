@@ -38,14 +38,14 @@ För varje scenario: välj vilken typ av AI-kompis (eller ingen alls) du skulle 
 
 
 
-1. Först hade jag behövt veta om jag får använda AI på denna kodbas. Har hört att vissa företag inte tillåter AI eller har en egen modell. För att läsa koden och förklara den hade jag behövt en "källsnokare" som kan hantera så mycket code, sen bara bett den förklara, jag behöver inte planera hur den ska förklara, dvs "förklara hur inloggningen fungerar."
+1. Först hade jag behövt veta om jag får använda AI på denna kodbas. Har hört att vissa företag inte tillåter AI eller har en egen modell. För att läsa koden och förklara den hade jag behövt en "källsnokare" som kan hantera koden, sen bara bett den förklara, jag behöver inte planera hur den ska förklara, bara "förklara hur inloggningen fungerar."
 
-2. Jag hade troligen inte behövt AI för att fixa metoden. Det finns andra bra sätt att uppdatera en metod i ett projekt och alla ställen som använder den. Om jag har tillgång till AI så kan Copilot inline vara ett bra alternativ (har inte så mycket erfarenhet av den än). Annars hade jag bett AI att bara fixa metoden. Sen kan jag kika manuellt på om det är några kompileringsfel.
+2. Jag hade troligen inte behövt AI för att fixa metoden. Det finns andra bra sätt att uppdatera en metod i ett projekt och alla ställen som använder den. Om jag har tillgång till AI så kan Copilot inline vara ett bra alternativ (har inte så mycket erfarenhet av den än men verkar okej). Annars hade jag bett AI att bara fixa metoden. Sen kan jag kika manuellt på om det är några kompileringsfel.
 
 3. Om jag vet var i koden felstavningen är så kan jag enkelt bara fixa det. Annars kan jag be AI att bara fixa det. Jag behöver ingen planering. Jag hade troligen använt git innan jag pushar för att vara säker på att den bara ändrar stavfelet. (Fork är min default git client.)
 
 4. Tack vare att det inte är bråttom, så kan jag be AI att skapa en plan. Beroende på hur många tester jag behöver göra så kan jag låta den köra testerna på natten. Jag kan också ge den fria händer att ändra projektet på en egen branch och be den försöka fixa problemet tills alla tester är OK. (Dock kan detta bli ett problem om testerna inte är fullständiga – en daglig check är troligen ett bra sätt att vara säker på att AI:n inte spårar ur med ändringarna.)
 
-5. Hade kunnat fråga ChatGPT eller en annan AI om en lista med bra gratis alternativ för AI-modeller som ska hantera kod. Sen be den förklara vad som är bra eller bättre mellan dem och be om källor. Jag hade kikat på källorna för att vara säker på att den har hittat rätt info.
+5. Jag skulle kunna använda OpenCode och testa modeller själv (Har inte testat detta, men vet att man kan det.). Eller så hade jag kunnat fråga ChatGPT eller en annan AI om en lista med bra gratis alternativ för AI-modeller som ska hantera kod. Sen be den förklara vad som är bra eller bättre mellan dem och be om källor. Jag hade kikat på källorna för att vara säker på att den har hittat rätt info.
 
 6. Behöver inte AI för detta, det finns redan bra verktyg för att automatiskt lägga till konstruktor och getters. Med det sagt så kan det vara snabbare att bara använda en AI för att skapa det åt mig. 
