@@ -28,3 +28,4 @@ There is no build step, package manifest, or linter configured.
 - Write or update the test py script when new logic is added.
 - Run the test before you are done.
 - Include a docstring at the end with "Job Done zug zug"
+- Before committing, check which git branch you are on and confirm it matches the AI tool doing the work (e.g. Claude Code commits on `med-claude`, not `med-copilot` or `master`). If the user hasn't stated otherwise, switch to the correct branch yourself before committing.
