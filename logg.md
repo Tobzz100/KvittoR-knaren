@@ -8,3 +8,5 @@
 
 
 Note: Hade inga problem, Claude lyckades direct, dock så kan det vara för den hade mer info om uppgiften jag försökte lösa. Jag använde claude for att bättre förstå uppgiften genom att låta den läsa sidan direct. Jag bad den också att inte lösa upgiften, bara förklara. 
+
+Övning 4 Claude: 
