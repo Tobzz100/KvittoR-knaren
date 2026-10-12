@@ -9,7 +9,16 @@
 
 Note: Hade inga problem, Claude lyckades direkt, dock så kan det vara för den hade mer info om uppgiften jag försökte lösa. Jag använde Claude för att bättre förstå uppgiften genom att låta den läsa sidan direkt. Jag bad den också att inte lösa uppgiften, bara förklara. 
 
-Övning 4 Claude: Had one problem where it was on the wrong branch (master), which still had the old scripts without the Övning 3 changes. Had to tell it to switch branch and re-plan with the updated script. Other than that no issues. It gave 3 questions on how to implement a multi-currency feature.
+------------------------------------------------------------------------------
+
+Övning 4
+
+Övning 4 Claude: Had one problem where it was on the wrong branch (master), which still had the old scripts without the Övning 3 changes. Had to tell it to switch branch and re-plan with the updated script. Other than that no issues. It gave 3 questions on how to implement a multi-currency feature.  
 
 Övning 4 OpenCode: No real problems. It also gave 3 clarifying questions up front (what "multiple currencies" should mean, where the rates come from, and which branch to use) before writing any code. I chose conversion with fixed rates, a hardcoded rate table in the module, and the med-opencode branch, so it built on top of the Övning 3 discount change instead of the outdated master script. It added the EXCHANGE_RATES table, a currency parameter defaulting to SEK, conversion applied after VAT, and raised ValueError on unknown currencies. It added 6 new tests and all 10 were green before it committed. It committed on the correct branch and only pushed after I explicitly asked.
 
+The difference between just running and planning is the ability to inspect the changes before it starts, which allows you to have more control and insight about how it works.
+I think planning mode is good when making big changes and when you want more control of what the AI is actually planning to do. For small commands, like for example, push to git, using planning mode is unnecessary. 
+
+
+------------------------------------------------------------------------------
