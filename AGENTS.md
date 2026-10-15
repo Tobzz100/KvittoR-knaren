@@ -12,7 +12,7 @@ Kvittoräknaren ("the receipt counter") is a small Swedish-language Python exerc
 - Run tests (covers all four versions below): `python test_kvittoraknaren.py` or `python -m unittest test_kvittoraknaren.py`.
 - Run a single test: `python -m unittest test_kvittoraknaren.TestAllVersionsCommonBehavior.test_two_items_100kr_25_percent_moms`.
 - Install the website's dependency: `pip install -r requirements.txt` (first time only).
-- Run the comparison website: `python webapp/app.py` (serves at `http://127.0.0.1:5000`).
+- Run the comparison website: `python webapp/app.py` (serves at `http://127.0.0.1:5000`), or double-click `start_webapp.bat` to start the server in its own window and open the page automatically.
 - Run the website's own tests: `python webapp/test_app.py` or `python -m unittest webapp/test_app.py`.
 
 There is no build step or linter configured. `requirements.txt` lists the repo's only dependency (Flask), used solely by `webapp/`.
