@@ -137,6 +137,9 @@ def api_calculate():
 
 @app.route("/api/test/<version>", methods=["POST"])
 def api_test(version):
+    # All four versions now share a single test file at the repo root
+    # (test_kvittoraknaren.py), so running "tests for a version" actually
+    # runs that one shared suite, which covers all four together.
     entry = get_version(version)
     if entry is None:
         return jsonify({"error": "Unknown version"}), 404
@@ -144,7 +147,7 @@ def api_test(version):
     try:
         result = subprocess.run(
             [sys.executable, "test_kvittoraknaren.py"],
-            cwd=version_folder_abs(entry),
+            cwd=os.path.join(APP_DIR, ".."),
             capture_output=True,
             text=True,
             timeout=30,
