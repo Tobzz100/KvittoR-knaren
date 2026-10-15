@@ -51,6 +51,11 @@ class TestKvittoraknaren(unittest.TestCase):
         result = kvittoraknaren.main("vara1 100 XXX, vara2 100 SEK", 1.25)
         self.assertEqual(result, 125)
 
+    def test_milk_bread_eggs_mixed_currencies(self):
+        # 10 SEK + 25 EUR (287.5 kr) + 12 SEK (ingen valuta angiven) = 309.5 kr, sedan 25% moms = 386.875 kr
+        result = kvittoraknaren.main("milk 10 SEK, bred 25 EUR, eggs 12", 1.25)
+        self.assertEqual(result, 386.875)
+
 
 if __name__ == "__main__":
     unittest.main()
