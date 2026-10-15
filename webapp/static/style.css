@@ -1,0 +1,111 @@
+:root {
+  color-scheme: light dark;
+  font-family: system-ui, sans-serif;
+}
+
+body {
+  margin: 0;
+  padding: 1.5rem;
+  background: #f4f4f5;
+  color: #1a1a1a;
+}
+
+main {
+  max-width: 40rem;
+  margin: 0 auto;
+}
+
+h1 {
+  margin-bottom: 0.1rem;
+}
+
+.subtitle {
+  margin-top: 0;
+  color: #555;
+}
+
+.panel {
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 1rem 1.25rem;
+  margin-bottom: 1rem;
+}
+
+label {
+  display: block;
+  font-weight: 600;
+  margin-top: 0.75rem;
+  margin-bottom: 0.25rem;
+}
+
+select, input, textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.4rem;
+  font-size: 1rem;
+}
+
+.help {
+  font-size: 0.85rem;
+  color: #666;
+  margin: 0.25rem 0 0;
+}
+
+.quirk {
+  font-size: 0.9rem;
+  color: #444;
+  background: #fff8e1;
+  border: 1px solid #f0d58c;
+  border-radius: 6px;
+  padding: 0.5rem 0.75rem;
+  margin-top: 0.5rem;
+}
+
+.field.hidden {
+  display: none;
+}
+
+button {
+  margin-top: 1rem;
+  padding: 0.5rem 1.2rem;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+#result {
+  margin-top: 1rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+#result.error {
+  color: #b00020;
+}
+
+#result.success {
+  color: #146c2e;
+}
+
+#test-status {
+  margin-top: 0.5rem;
+  font-weight: 600;
+}
+
+#test-status.pass {
+  color: #146c2e;
+}
+
+#test-status.fail {
+  color: #b00020;
+}
+
+#test-output {
+  background: #1e1e1e;
+  color: #e6e6e6;
+  padding: 0.75rem;
+  border-radius: 6px;
+  overflow-x: auto;
+  white-space: pre-wrap;
+  min-height: 1.5rem;
+}
