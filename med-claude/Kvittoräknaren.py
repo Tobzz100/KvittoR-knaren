@@ -1,3 +1,4 @@
+from decimal import Decimal, ROUND_HALF_UP
 
 DISCOUNT_CODES = {
     "RABATT10": 0.10,
@@ -38,6 +39,61 @@ def main(shoppingList, moms, discount_code=None, target_currency="SEK"):
 
     target_currency = target_currency.upper()
     return total_sek / EXCHANGE_RATES_TO_SEK[target_currency]
+
+
+RECEIPT_WIDTH = 31
+MAX_NAME_LENGTH = 20
+
+
+def _to_decimal(value):
+    return Decimal(str(value))
+
+
+def _format_amount(amount):
+    """Format an amount with two decimals and a decimal comma, e.g. 1234.5 -> '1234,50'."""
+    rounded = amount.quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+    return f"{rounded:.2f}".replace(".", ",")
+
+
+def _format_rate(rate):
+    """Format a VAT rate without needless decimals, e.g. 25 -> '25', 12.5 -> '12,5'."""
+    return format(rate.normalize(), "f").replace(".", ",")
+
+
+def _receipt_line(label, amount):
+    return label + _format_amount(amount).rjust(RECEIPT_WIDTH - len(label))
+
+
+def format_receipt(items):
+    """Return a receipt as text for a list of (name, price excl. VAT, VAT rate in percent)."""
+    if not items:
+        return "Inga varor"
+
+    lines = ["KVITTO"]
+    subtotal = Decimal("0")
+    net_per_rate = {}
+
+    for name, price, vat_percent in items:
+        price = _to_decimal(price)
+        rate = _to_decimal(vat_percent)
+        if len(name) > MAX_NAME_LENGTH:
+            name = name[:MAX_NAME_LENGTH - 3] + "..."
+        lines.append(_receipt_line(name, price))
+        subtotal += price
+        net_per_rate[rate] = net_per_rate.get(rate, Decimal("0")) + price
+
+    lines.append("-" * RECEIPT_WIDTH)
+    lines.append(_receipt_line("Summa exkl. moms", subtotal))
+
+    total = subtotal
+    for rate in sorted(net_per_rate, reverse=True):
+        vat = (net_per_rate[rate] * rate / 100).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+        lines.append(_receipt_line(f"Moms {_format_rate(rate)} %", vat))
+        total += vat
+
+    lines.append("-" * RECEIPT_WIDTH)
+    lines.append(_receipt_line("ATT BETALA", total))
+    return "\n".join(lines)
 
 
 
