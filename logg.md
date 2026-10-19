@@ -81,13 +81,12 @@ AI:n påpekade också att 0 % moms borde vara med, eftersom den momssatsen ocks�
 
 # Modul 3 - Övning 4 Granska dagens AI-kod
 
+
+Kör git diff main (eller master) för att se allt som ändrats under dagen. Gå igenom koden med checklistan och fyll i tabellen. Skriv en kort kommentar för varje rad, även när svaret är ”OK”.
+
+
 Finns alla funktioner och bibliotek som anropas?
-
-Ja. AI:n kontrollerade med ett litet skript att alla namn som används i koden är definierade, importerade eller inbyggda, och att alla importerade bibliotek går att hitta. Inga saknades. Alla tester kördes också och gick igenom, så funktionerna som anropas finns på riktigt. Biblioteken är Pythons standardbibliotek (decimal, unittest, importlib, os, sys, io, runpy, contextlib, subprocess) och Flask, som redan fanns i requirements.txt. Det enda AI anmärka på är att testrapporten (kvitto_testrunner.py) använder två interna metoder i unittest (_exc_info_to_string och _subDescription). De fungerar i Python 3.12 men är inte en officiell del av biblioteket och kan ändras i en framtida Python-version.
-
 Har nya beroenden lagts till?
-
-Nej. requirements.txt har inte ändrats i dag och innehåller fortfarande bara Flask==3.0.3. Alla nya importer i dagens kod kommer från Pythons standardbibliotek (decimal, unittest, importlib, io, os, sys, runpy, contextlib), utom kvitto_testrunner, som är projektets egen fil. När uppgiften med kvittot sa "inga nya beroenden" valde AI:n decimal från standardbiblioteket för att räkna exakt med pengar, i stället för att installera något. Den installerade inte heller pyflakes för att granska koden, utan skrev ett eget litet kontrollskript.
 		
 
 
