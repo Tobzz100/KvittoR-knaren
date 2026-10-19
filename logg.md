@@ -1,4 +1,4 @@
-# Övning 3 – Samma uppgift, tre kompisar
+# Modul 2 - Övning 3 – Samma uppgift, tre kompisar
 
 | Verktyg | Antal promptar | Följde din egna regel? | Testerna gröna? | Vad fick du rätta själv? |
 |---|---|---|---|---|
@@ -11,7 +11,7 @@ Note: Hade inga problem, Claude lyckades direkt, dock så kan det vara för den 
 
 ------------------------------------------------------------------------------
 
-# Övning 3 – Planera före du kör
+# Modul 2 - Övning 3 – Planera före du kör
 
 Övning 4 Claude: Hade ett problem där den var på fel gren (master), som fortfarande hade de gamla skripten utan ändringarna från Övning 3. Fick säga till den att byta gren och planera om med det uppdaterade skriptet. Annars inga problem. Den ställde 3 frågor om hur stödet för flera valutor skulle implementeras.
 
@@ -26,7 +26,7 @@ Jag tycker att planeringsläge är bra vid stora ändringar och när man vill ha
 ------------------------------------------------------------------------------
 
 
-# Övning 5 - Välj rätt kompis
+# Modul 2 - Övning 5 - Välj rätt kompis
 För varje scenario: välj vilken typ av AI-kompis (eller ingen alls) du skulle använda, och motivera i 2–3 meningar. Det finns inga helt rätta svar, men det finns bättre och sämre motiveringar.
 
     1. Du är ny på jobbet. Kodbasen har 40 000 rader och du ska förstå hur inloggningen fungerar innan mötet i eftermiddag.
@@ -73,11 +73,21 @@ Mitt första test (kaffe 100 kr med 25 % och bröd 50 kr med 12 %) visade bara e
 Slutsatsen är att ett enda test bara fångar det fel det råkar träffa. När AI:n har lagat kod räcker det inte att det test som först misslyckades blir grönt. Testerna behöver täcka alla momssatser (25, 12 och 6 %), flera varor med samma momssats, decimalbelopp som måste avrundas och en tom lista. Det är också bra att köra hela testsviten efter lagningen, inte bara det test som visade felet.
 
 
-# Uppslagstabell för momssatser
+# Modul 3 - Uppslagstabell för momssatser
 
 Uppgiften var att byta ut if-satserna i vat_breakdown mot en uppslagstabell. Den rättade funktionen hade redan inga if-satser kvar, eftersom den räknade momsen direkt från varje varas momssats, men den hade ingen tabell heller. Jag bad AI:n först skriva ett test som kräver att en ogiltig momssats ger ett fel. Testet blev rött, och sedan lade AI:n till en uppslagstabell med de tillåtna satserna så att testet blev grönt. Nu ger en momssats som inte finns i tabellen ett ValueError, så funktionen kan inte längre hantera vilken sats som helst.
 
 AI:n påpekade också att 0 % moms borde vara med, eftersom den momssatsen också finns i Sverige, till exempel för viss export och sjukvård. Jag hade bara tänkt på 25, 12 och 6 %. Därför finns 0 % med i tabellen och har ett eget test.
 
+# Modul 3 - Övning 4 Granska dagens AI-kod
 
+Finns alla funktioner och bibliotek som anropas?
 
+Ja. AI:n kontrollerade med ett litet skript att alla namn som används i koden är definierade, importerade eller inbyggda, och att alla importerade bibliotek går att hitta. Inga saknades. Alla tester kördes också och gick igenom, så funktionerna som anropas finns på riktigt. Biblioteken är Pythons standardbibliotek (decimal, unittest, importlib, os, sys, io, runpy, contextlib, subprocess) och Flask, som redan fanns i requirements.txt. Det enda att anmärka på är att testrapporten (kvitto_testrunner.py) använder två interna metoder i unittest (_exc_info_to_string och _subDescription). De fungerar i Python 3.12 men är inte en officiell del av biblioteket och kan ändras i en framtida Python-version.
+
+Har nya beroenden lagts till?		
+Hanteras kantfall och felaktig indata?		
+Testar testerna verkligen något? Ändrades förväntade värden?		
+Finns det säkerhetsrisker (hårdkodade värden, ovaliderad indata)?		
+Följer koden reglerna i din AGENTS.md?		
+Kan du förklara varje rad?
