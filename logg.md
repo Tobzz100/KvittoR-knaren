@@ -87,7 +87,7 @@ Kör git diff main (eller master) för att se allt som ändrats under dagen. Gå
 
 Finns alla funktioner och bibliotek som anropas? 
 
-Ja: Jag gick igenom VS Code och titta att alla functioner i kvittoräknaren finns, samt bibloteken. Jag bad också AI att gå igenom efter, för att vara extra säker. 
+Ja: Jag gick igenom VS Code och tittade att alla funktioner som anropas i kvittoräknaren finns, samt biblioteken. Jag bad också AI:n att gå igenom efter, för att vara extra säker. 
 
 Har nya beroenden lagts till?
 		
