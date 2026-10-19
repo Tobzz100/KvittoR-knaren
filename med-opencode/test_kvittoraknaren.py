@@ -1,6 +1,10 @@
 import importlib.util
 import os
+import sys
 import unittest
+
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
+from kvitto_testrunner import ReportRunner
 
 MODULE_PATH = os.path.join(os.path.dirname(__file__), "Kvittoräknaren.py")
 spec = importlib.util.spec_from_file_location("kvittoraknaren_med_opencode", MODULE_PATH)
@@ -37,7 +41,7 @@ class TestCurrency(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    unittest.main()
+    unittest.main(testRunner=ReportRunner())
 
 
 """

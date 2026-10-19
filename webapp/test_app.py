@@ -3,7 +3,9 @@ import sys
 import unittest
 
 sys.path.insert(0, os.path.dirname(__file__))
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
 import app as webapp_app
+from kvitto_testrunner import ReportRunner
 
 
 class TestWebApp(unittest.TestCase):
@@ -141,7 +143,7 @@ class TestWebApp(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    unittest.main()
+    unittest.main(testRunner=ReportRunner())
 
 
 """

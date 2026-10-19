@@ -2,9 +2,13 @@ import importlib.util
 import io
 import os
 import runpy
+import sys
 import unittest
 from contextlib import redirect_stdout
 from unittest.mock import patch
+
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
+from kvitto_testrunner import ReportRunner
 
 MODULE_PATH = os.path.join(os.path.dirname(__file__), "Kvittoräknaren.py")
 spec = importlib.util.spec_from_file_location("kvittoraknaren_med_copilot", MODULE_PATH)
@@ -60,7 +64,7 @@ class TestCliBehavior(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    unittest.main()
+    unittest.main(testRunner=ReportRunner())
 
 
 """

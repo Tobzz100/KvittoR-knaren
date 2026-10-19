@@ -16,6 +16,8 @@ Kvittoräknaren ("the receipt counter") is a small Swedish-language Python exerc
 - Run the comparison website: `python webapp/app.py` (serves at `http://127.0.0.1:5000`), or double-click `start_webapp.bat` to start the server in its own window and open the page automatically.
 - Run the website's own tests: `python webapp/test_app.py` or `python -m unittest webapp/test_app.py`.
 
+Every test file ends with `unittest.main(testRunner=ReportRunner())`, using `kvitto_testrunner.py` at the repo root: it prints each test as `[PASS]`/`[FAIL]`/`[SKIP]`, then a list of failed tests with tracebacks, then a `Ran N tests: X passed, Y failed` summary (exit code 1 on failure). Test files outside the root add the repo root to `sys.path` to import it. New test files should do the same. (`python -m unittest ...` still works but uses the standard unittest output.)
+
 There is no build step or linter configured. `requirements.txt` lists the repo's only dependency (Flask), used solely by `webapp/`.
 
 ## Architecture

@@ -2,6 +2,8 @@ import importlib.util
 import os
 import unittest
 
+from kvitto_testrunner import ReportRunner
+
 REPO_ROOT = os.path.dirname(__file__)
 
 VERSIONS = {
@@ -57,7 +59,7 @@ class TestAllVersionsCommonBehavior(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    unittest.main()
+    unittest.main(testRunner=ReportRunner())
 
 
 """
