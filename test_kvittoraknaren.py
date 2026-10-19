@@ -252,6 +252,16 @@ class TestMedClaudeVatBreakdown(unittest.TestCase):
         items = [("Kaffe", 100, 25), ("Bröd", 50, 12)]
         self.assertEqual(self.vat_breakdown(items), {25: 25, 12: 6})
 
+    def test_all_three_swedish_vat_rates_with_several_items_each(self):
+        # 25 %: (100 + 40) * 0,25 = 35,00; 12 %: (50 + 20) * 0,12 = 8,40; 6 %: (200 + 30) * 0,06 = 13,80
+        items = [
+            ("Kaffe", 100, 25), ("Bröd", 50, 12), ("Bok", 200, 6),
+            ("Te", 40, 25), ("Mjölk", 20, 12), ("Tidning", 30, 6),
+        ]
+        breakdown = self.vat_breakdown(items)
+        self.assertEqual(breakdown, {25: Decimal("35.00"), 12: Decimal("8.40"), 6: Decimal("13.80")})
+        self.assertEqual(list(breakdown), [25, 12, 6])
+
     def test_items_with_same_rate_are_summed(self):
         items = [("Kaffe", 100, 25), ("Te", 40, 25)]
         self.assertEqual(self.vat_breakdown(items), {25: Decimal("35.00")})
