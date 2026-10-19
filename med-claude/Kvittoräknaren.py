@@ -73,20 +73,15 @@ def _receipt_line(label, amount):
 
 
 def vat_breakdown(items):
-    """Return the VAT per rate for (name, price excl. VAT, VAT rate in percent) items.
-
-    The result maps each VAT rate that occurs to its VAT amount rounded to two decimals,
-    ordered highest rate first, e.g. {Decimal('25'): Decimal('25.00'), Decimal('6'): Decimal('12.00')}.
-    """
-    net_per_rate = {}
-    for _name, price, vat_percent in items:
-        rate = _to_decimal(vat_percent)
-        net_per_rate[rate] = net_per_rate.get(rate, Decimal("0")) + _to_decimal(price)
-
+    """Returnerar momsbelopp per momssats, t.ex. {25: 25.0, 12: 6.0}."""
     breakdown = {}
-    for rate in sorted(net_per_rate, reverse=True):
-        vat = net_per_rate[rate] * rate / 100
-        breakdown[rate] = vat.quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+    for i in range(1, len(items)):
+        name, price, rate = items[i]
+        if rate == 25:
+            vat = price * 0.25
+        else:
+            vat = price * 0.12
+        breakdown[rate] = breakdown.get(rate, 0) + vat
     return breakdown
 
 
@@ -108,8 +103,11 @@ def format_receipt(items):
     lines.append("-" * RECEIPT_WIDTH)
     lines.append(_receipt_line("Summa exkl. moms", subtotal))
 
+    # vat_breakdown() may return plain ints/floats in any order, so normalize to Decimal and sort here.
+    breakdown = {_to_decimal(rate): _to_decimal(vat) for rate, vat in vat_breakdown(items).items()}
     total = subtotal
-    for rate, vat in vat_breakdown(items).items():
+    for rate in sorted(breakdown, reverse=True):
+        vat = breakdown[rate].quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
         lines.append(_receipt_line(f"Moms {_format_rate(rate)} %", vat))
         total += vat
 
