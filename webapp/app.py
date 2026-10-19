@@ -137,31 +137,41 @@ def api_calculate():
 
 @app.route("/api/test/<version>", methods=["POST"])
 def api_test(version):
-    # All four versions now share a single test file at the repo root
-    # (test_kvittoraknaren.py), so running "tests for a version" actually
-    # runs that one shared suite, which covers all four together.
+    # Runs the shared tests at the repo root (behavior all four versions agree on)
+    # plus the selected version's own test file in its folder, if it has one.
     entry = get_version(version)
     if entry is None:
         return jsonify({"error": "Unknown version"}), 404
 
-    try:
-        result = subprocess.run(
-            [sys.executable, "test_kvittoraknaren.py"],
-            cwd=os.path.join(APP_DIR, ".."),
-            capture_output=True,
-            text=True,
-            timeout=30,
-        )
-    except subprocess.TimeoutExpired:
-        return jsonify({"error": "Test run timed out"}), 500
+    repo_root = os.path.join(APP_DIR, "..")
+    test_files = [os.path.join(repo_root, "test_kvittoraknaren.py")]
+    version_test_file = os.path.join(version_folder_abs(entry), "test_kvittoraknaren.py")
+    if os.path.abspath(version_test_file) != os.path.abspath(test_files[0]) and os.path.exists(version_test_file):
+        test_files.append(version_test_file)
 
-    output = result.stdout + result.stderr
+    outputs = []
+    returncode = 0
+    for test_file in test_files:
+        try:
+            result = subprocess.run(
+                [sys.executable, test_file],
+                cwd=repo_root,
+                capture_output=True,
+                text=True,
+                timeout=30,
+            )
+        except subprocess.TimeoutExpired:
+            return jsonify({"error": "Test run timed out"}), 500
+        label = os.path.relpath(test_file, repo_root)
+        outputs.append(f"== {label} ==\n{result.stdout}{result.stderr}")
+        returncode = returncode or result.returncode
+
     return jsonify(
         {
             "version": version,
-            "passed": result.returncode == 0,
-            "returncode": result.returncode,
-            "output": output,
+            "passed": returncode == 0,
+            "returncode": returncode,
+            "output": "\n".join(outputs),
         }
     )
 

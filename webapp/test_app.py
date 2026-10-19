@@ -127,6 +127,17 @@ class TestWebApp(unittest.TestCase):
         data = response.get_json()
         self.assertTrue(data["passed"])
         self.assertEqual(data["returncode"], 0)
+        self.assertIn("test_kvittoraknaren.py", data["output"])
+        self.assertNotIn("med-claude", data["output"])
+
+    def test_run_tests_version_runs_shared_and_its_own_tests_only(self):
+        response = self.client.post("/api/test/med-claude")
+        self.assertEqual(response.status_code, 200)
+        data = response.get_json()
+        self.assertTrue(data["passed"])
+        self.assertIn(os.path.join("med-claude", "test_kvittoraknaren.py"), data["output"])
+        self.assertNotIn("med-copilot", data["output"])
+        self.assertNotIn("med-opencode", data["output"])
 
 
 if __name__ == "__main__":
