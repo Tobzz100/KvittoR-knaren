@@ -114,3 +114,7 @@ Ja, i stort sett. AI:n committade efter varje ändring utan att pusha, lade till
 
 Kan du förklara varje rad?
 Delvis: Jag förstår logiken i varje rad, eftersom den är densamma som i C#, som jag har mest erfarenhet av. Viss Python-syntax kan jag inte så bra. När AI:n förhörde mig på en rad missförstod jag slicing (tokens[:-2] ger en del av listan, inte ett element), att en tom sträng räknas som falsk (if t) och att or används som reservvärde. Efter förklaringen förstår jag dem, men jag skulle behöva slå upp sådan syntax när jag granskar Python-kod.
+
+
+Skriv till sist 3–5 meningar: Vad var det bästa och det sämsta AI:n producerade idag? Vad skulle du ha missat om du inte granskat?
+Det bästa var hur snabbt AI:n skrev kod och tester som hade tagit mig mycket längre tid, och hur snabbt den hittade problem i koden och förklarade dem för mig. När jag inte riktigt förstod vad en uppgift ville ha av mig förklarade den uppgiften och gav mig tips på vad jag skulle titta efter. Det sämsta var att den ibland förklarade för mycket, så att jag var rädd att den gav mig svaren utan att jag själv fick tänka till. Utan granskningen hade jag missat att koden godtog "nan", "inf" och negativa priser, och att en okänd valuta fortfarande kraschar programmet.
