@@ -97,12 +97,20 @@ Hanteras kantfall och felaktig indata?
 Ja, efter en rättning: Alla kantfall från instruktionerna har tester, till exempel tom lista, för långa varunamn, ogiltig momssats och avrundning. Jag bad också AI:n att prova annan felaktig indata, och då hittade vi några fall som koden inte hanterade: "nan" och "inf" godtogs som pris (kvittot visade då NaN), negativa priser godtogs och gav negativ moms, och ett pris som text gav ett otydligt fel. Jag bad AI:n rätta dem. Nu hoppas sådana rader i inköpslistan över med en varning, och vat_breakdown och format_receipt ger ett tydligt ValueError ("Ogiltigt pris"). Pris 0 är fortfarande tillåtet. Det finns nya tester för alla fallen (TestInvalidPrices). Kvar är bara att en okänd valuta för totalen (t.ex. GBP) ger KeyError i main. Det är ett känt fel med ett eget test, och webbsajten fångar det och visar ett vänligt felmeddelande.
 
 
-Testar testerna verkligen något? Ändrades förväntade värden?		
-Testar de något: Ja. När jag lade in den trasiga funktionen blev tio tester röda och visade alla tre felen. Testet för ogiltig momssats var också rött tills funktionen rättades. Testerna fångar alltså fel på riktigt.
+Testar testerna verkligen något? Ändrades förväntade värden?
 
+Testar de något: Ja. När jag lade in den trasiga funktionen blev tio tester röda och visade alla tre felen. Testet för ogiltig momssats var också rött tills funktionen rättades. Testerna fångar alltså fel på riktigt.
 Ändrades förväntade värden: Nej, inte för att få testerna gröna. När testerna delades upp per version flyttades värdena oförändrade till varje versions egen testfil. Det enda som ändrades var webbsajtens tester, när jag tog bort det ursprungliga .py-skriptet och bad AI:n ta bort det ur testerna också.
 
 
-Finns det säkerhetsrisker (hårdkodade värden, ovaliderad indata)?		
+Finns det säkerhetsrisker (hårdkodade värden, ovaliderad indata)?	
+Hårdkodade värden: Nej, det finns inga lösenord eller nycklar i koden. Det enda som liknar en hemlighet är rabattkoderna, som alla som har tillgång till koden kan se. Momssatserna och valutakurserna är också hårdkodade, men de är offentliga, så det är ingen säkerhetsrisk.
+
+Ovaliderad indata: Delvis. Priserna i inköpslistan kontrolleras nu, efter rättningen av kantfallen. Men en okänd valuta för totalen (t.ex. GBP) kontrolleras inte och ger ett KeyError i main. Webbsajten var inte en del av uppgiften, så jag har inte granskat den på djupet, men AI:n påpekade att momsfältet inte kontrolleras och att Flask körs i debug-läge, vilket inte får användas om sajten blir nåbar för andra.
+
 Följer koden reglerna i din AGENTS.md?		
+Ja, i stort sett. AI:n committade efter varje ändring utan att pusha, lade till "Job Done zug zug" i alla Python-filer, skrev tester för ny logik och körde testerna innan den var klar. Den ändrade filer utanför med-claude, men bara när jag bad om det. Det som följdes sämst var regeln att fråga innan små tillägg: ibland lade den till saker, som en ny hjälpfunktion och en testrapport, utan att fråga först.
+
+
 Kan du förklara varje rad?
+Delvis: Jag förstår logiken i varje rad, eftersom den är densamma som i C#, som jag har mest erfarenhet av. Viss Python-syntax kan jag inte så bra. När AI:n förhörde mig på en rad missförstod jag slicing (tokens[:-2] ger en del av listan, inte ett element), att en tom sträng räknas som falsk (if t) och att or används som reservvärde. Efter förklaringen förstår jag dem, men jag skulle behöva slå upp sådan syntax när jag granskar Python-kod.
