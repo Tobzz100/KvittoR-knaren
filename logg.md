@@ -80,41 +80,40 @@ Uppgiften var att byta ut if-satserna i vat_breakdown mot en uppslagstabell. Den
 AI:n påpekade också att 0 % moms borde vara med, eftersom den momssatsen också finns i Sverige, till exempel för viss export och sjukvård. Jag hade bara tänkt på 25, 12 och 6 %. Därför finns 0 % med i tabellen och har ett eget test.
 
 # Modul 3 - Övning 4 Granska dagens AI-kod
-
-
 Kör git diff main (eller master) för att se allt som ändrats under dagen. Gå igenom koden med checklistan och fyll i tabellen. Skriv en kort kommentar för varje rad, även när svaret är ”OK”.
 
-
-Finns alla funktioner och bibliotek som anropas? 
-
+# Finns alla funktioner och bibliotek som anropas? 
 Ja: Jag gick igenom VS Code och tittade att alla funktioner som anropas i kvittoräknaren finns, samt biblioteken. Jag bad också AI:n att gå igenom efter, för att vara extra säker. 
 
-Har nya beroenden lagts till?
-
+# Har nya beroenden lagts till?
 Nej: Vi körde git diff mot dagens första commit (git diff 2442f83 -- requirements.txt) och requirements.txt har inte ändrats, den innehåller fortfarande bara Flask. Vi gick också igenom de nya importraderna i diffen. Alla kommer från Pythons standardbibliotek (till exempel decimal, unittest och os), som inte behöver installeras, eller från projektets egen fil kvitto_testrunner.py. Inget nytt paket behöver installeras med pip.
 		
-Hanteras kantfall och felaktig indata?		
+# Hanteras kantfall och felaktig indata?		
 Ja, efter en rättning: Alla kantfall från instruktionerna har tester, till exempel tom lista, för långa varunamn, ogiltig momssats och avrundning. Jag bad också AI:n att prova annan felaktig indata, och då hittade vi några fall som koden inte hanterade: "nan" och "inf" godtogs som pris (kvittot visade då NaN), negativa priser godtogs och gav negativ moms, och ett pris som text gav ett otydligt fel. Jag bad AI:n rätta dem. Nu hoppas sådana rader i inköpslistan över med en varning, och vat_breakdown och format_receipt ger ett tydligt ValueError ("Ogiltigt pris"). Pris 0 är fortfarande tillåtet. Det finns nya tester för alla fallen (TestInvalidPrices). Kvar är bara att en okänd valuta för totalen (t.ex. GBP) ger KeyError i main. Det är ett känt fel med ett eget test, och webbsajten fångar det och visar ett vänligt felmeddelande.
 
-
-Testar testerna verkligen något? Ändrades förväntade värden?
-
+# Testar testerna verkligen något? Ändrades förväntade värden?
 Testar de något: Ja. När jag lade in den trasiga funktionen blev tio tester röda och visade alla tre felen. Testet för ogiltig momssats var också rött tills funktionen rättades. Testerna fångar alltså fel på riktigt.
 Ändrades förväntade värden: Nej, inte för att få testerna gröna. När testerna delades upp per version flyttades värdena oförändrade till varje versions egen testfil. Det enda som ändrades var webbsajtens tester, när jag tog bort det ursprungliga .py-skriptet och bad AI:n ta bort det ur testerna också.
 
-
-Finns det säkerhetsrisker (hårdkodade värden, ovaliderad indata)?	
+# Finns det säkerhetsrisker (hårdkodade värden, ovaliderad indata)?	
 Hårdkodade värden: Nej, det finns inga lösenord eller nycklar i koden. Det enda som liknar en hemlighet är rabattkoderna, som alla som har tillgång till koden kan se. Momssatserna och valutakurserna är också hårdkodade, men de är offentliga, så det är ingen säkerhetsrisk.
 
 Ovaliderad indata: Delvis. Priserna i inköpslistan kontrolleras nu, efter rättningen av kantfallen. Men en okänd valuta för totalen (t.ex. GBP) kontrolleras inte och ger ett KeyError i main. Webbsajten var inte en del av uppgiften, så jag har inte granskat den på djupet, men AI:n påpekade att momsfältet inte kontrolleras och att Flask körs i debug-läge, vilket inte får användas om sajten blir nåbar för andra.
 
-Följer koden reglerna i din AGENTS.md?		
+# Följer koden reglerna i din AGENTS.md?		
 Ja, i stort sett. AI:n committade efter varje ändring utan att pusha, lade till "Job Done zug zug" i alla Python-filer, skrev tester för ny logik och körde testerna innan den var klar. Den ändrade filer utanför med-claude, men bara när jag bad om det. Det som följdes sämst var regeln att fråga innan små tillägg: ibland lade den till saker, som en ny hjälpfunktion och en testrapport, utan att fråga först.
 
-
-Kan du förklara varje rad?
+# Kan du förklara varje rad?
 Delvis: Jag förstår logiken i varje rad, eftersom den är densamma som i C#, som jag har mest erfarenhet av. Viss Python-syntax kan jag inte så bra. När AI:n förhörde mig på en rad missförstod jag slicing (tokens[:-2] ger en del av listan, inte ett element), att en tom sträng räknas som falsk (if t) och att or används som reservvärde. Efter förklaringen förstår jag dem, men jag skulle behöva slå upp sådan syntax när jag granskar Python-kod.
 
-
-Skriv till sist 3–5 meningar: Vad var det bästa och det sämsta AI:n producerade idag? Vad skulle du ha missat om du inte granskat?
+# Skriv till sist 3–5 meningar: Vad var det bästa och det sämsta AI:n producerade idag? Vad skulle du ha missat om du inte granskat?
 Det bästa var hur snabbt AI:n skrev kod och tester som hade tagit mig mycket längre tid, och hur snabbt den hittade problem i koden och förklarade dem för mig. När jag inte riktigt förstod vad en uppgift ville ha av mig förklarade den uppgiften och gav mig tips på vad jag skulle titta efter. Det sämsta i koden var att den först inte hanterade felaktiga priser som "nan", "inf" och negativa tal, trots att alla tester var gröna, så kvittot kunde visa NaN som summa. Jag tyckte också att den ibland förklarade för mycket, så att jag var rädd att den gav mig svaren utan att jag själv fick tänka till. Utan granskningen hade jag missat de felaktiga priserna, en kvarlämnad kodrad med en kommentar som inte längre stämde (nu borttagen), och att en okänd valuta fortfarande kraschar programmet.
+
+# Modul 3 - Övning 5 IDE mot AI
+# Vilket sätt gick snabbast? 
+Snabbast var att trycka F2 och använda "Rename Symbol" i IDE:n. Det kan dock bli problem om namnet inte är helt rätt från början, eller om VS Code inte kan följa vilka anrop som hör till funktionen, som i det här projektet där filerna laddas med importlib. I de fallen kan AI:n vara bättre, eftersom den söker igenom alla filer och får en bättre överblick.
+# Vilket kändes säkrast? 
+Säkrast är nog att byta namn med IDE:n och sedan titta i git diff, så att man inte råkat ändra något ställe som man inte borde röra. Vill man vara riktigt säker kan man också be AI:n granska ändringen.
+
+# När skulle du välja AI:n för en refaktorisering, och när IDE:n?
+I C#-projekt skulle jag använda IDE:n, eftersom kompilatorn vet exakt vilka anrop som hör till en metod och säger till direkt om något missas. Python är dynamiskt, så där kan AI:n vara ett bättre val, särskilt när koden laddas på ovanliga sätt som IDE:n inte kan följa. Det beror också på hur stor refaktoriseringen är: gäller det bara en funktion i ett skript är IDE:n snabbast och säkrast.
