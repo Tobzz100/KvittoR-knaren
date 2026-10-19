@@ -61,9 +61,16 @@ Hittade AI:n alla själv, eller bara det fel som ditt första test visade?
 Vad säger det om hur du ska testa kod som AI:n har lagat?
 
 
-Jag hittade två fel i den trasiga funktionen. Den hoppade över den första varan, eftersom loopen började på index 1 i stället för 0. Den saknade också stöd för 6 % moms.
+Det fanns tre fel i den trasiga funktionen:
+1. Den hoppade över den första varan, eftersom loopen började på index 1 i stället för 0.
+2. Den räknade 6 % moms som 12 %, eftersom alla momssatser utom 25 % hamnade i samma else-gren med 12 %.
+3. Den avrundade inte momsen till två decimaler, så till exempel 19,90 kr med 12 % moms gav 2,388 i stället för 2,39.
 
 Jag hade ingen funktion som räknade ut momsen, så jag bad AI:n skapa en som jag sedan kunde byta ut mot den trasiga. När jag bytte till den trasiga varianten fick jag fler problem, eftersom den returnerade sitt resultat i ett annat format än mina tester förväntade sig. Jag bad AI:n anpassa formatet utan att ändra själva funktionen. Sedan bad jag den förklara vad som var fel med funktionen, och den beskrev felen den hade hittat. Till sist bad jag den rätta funktionen, vilket gick utan problem. Den nya funktionen räknar ut momsen utifrån varje varas egen momssats, så tekniskt sett kan den hantera vilken momssats som helst.
+
+Mitt första test (kaffe 100 kr med 25 % och bröd 50 kr med 12 %) visade bara ett av felen: att den första varan hoppades över. Brödets moms blev rätt av en slump, eftersom else-grenen råkade använda just 12 %. De två andra felen hittades av andra tester som redan fanns, med 6 % moms och med decimalbelopp. AI:n nämnde alla tre felen när den förklarade, men det var testerna som visade dem.
+
+Slutsatsen är att ett enda test bara fångar det fel det råkar träffa. När AI:n har lagat kod räcker det inte att det test som först misslyckades blir grönt. Testerna behöver täcka alla momssatser (25, 12 och 6 %), flera varor med samma momssats, decimalbelopp som måste avrundas och en tom lista. Det är också bra att köra hela testsviten efter lagningen, inte bara det test som visade felet.
 
 
 
