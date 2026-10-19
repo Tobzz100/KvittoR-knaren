@@ -90,6 +90,8 @@ Finns alla funktioner och bibliotek som anropas?
 Ja: Jag gick igenom VS Code och tittade att alla funktioner som anropas i kvittoräknaren finns, samt biblioteken. Jag bad också AI:n att gå igenom efter, för att vara extra säker. 
 
 Har nya beroenden lagts till?
+
+Nej: Vi körde git diff mot dagens första commit (git diff 2442f83 -- requirements.txt) och requirements.txt har inte ändrats, den innehåller fortfarande bara Flask. Vi gick också igenom de nya importraderna i diffen. Alla kommer från Pythons standardbibliotek (till exempel decimal, unittest och os), som inte behöver installeras, eller från projektets egen fil kvitto_testrunner.py. Inget nytt paket behöver installeras med pip.
 		
 
 
