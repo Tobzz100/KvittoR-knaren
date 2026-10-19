@@ -158,6 +158,13 @@ class TestVatBreakdown(unittest.TestCase):
     def test_empty_list_gives_empty_breakdown(self):
         self.assertEqual(kvitto.vat_breakdown([]), {})
 
+    def test_invalid_vat_rate_raises_value_error(self):
+        # Sverige har bara momssatserna 25, 12 och 6 %; alla andra satser ska ge ett fel
+        for rate in (20, 12.5, -6):
+            with self.subTest(rate=rate):
+                with self.assertRaises(ValueError):
+                    kvitto.vat_breakdown([("Kaffe", 100, 25), ("Konstig vara", 100, rate)])
+
 
 class TestCliReceipt(unittest.TestCase):
     """__main__ prints a receipt with 25 % moms on every item, prices converted to SEK."""
