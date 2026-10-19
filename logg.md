@@ -111,9 +111,9 @@ Det bästa var hur snabbt AI:n skrev kod och tester som hade tagit mig mycket l�
 
 # Modul 3 - Övning 5 IDE mot AI
 # Vilket sätt gick snabbast? 
-Snabbast var att trycka F2 och använda "Rename Symbol" i IDE:n. Det kan dock bli problem om namnet inte är helt rätt från början, eller om VS Code inte kan följa vilka anrop som hör till funktionen, som i det här projektet där filerna laddas med importlib. I de fallen kan AI:n vara bättre, eftersom den söker igenom alla filer och får en bättre överblick.
+Snabbast var att trycka F2 och använda "Rename Symbol" i IDE:n. I det här projektet fungerar det dock sämre: filnamnet Kvittoräknaren.py innehåller "ä", så testfilerna laddar filen med importlib, och då kan VS Code inte följa vilka anrop som hör till funktionen. I de fallen kan AI:n vara bättre, eftersom den söker igenom alla filer och får en bättre överblick.
 # Vilket kändes säkrast? 
-Säkrast är nog att byta namn med IDE:n och sedan titta i git diff, så att man inte råkat ändra något ställe som man inte borde röra. Vill man vara riktigt säker kan man också be AI:n granska ändringen.
+Säkrast är nog att byta namn med IDE:n och sedan titta i git diff, så att man inte råkat ändra något ställe som man inte borde röra. Vill man vara riktigt säker kan man också be AI:n granska ändringen och köra testen. Då borde det vara helt okej.
 
 # När skulle du välja AI:n för en refaktorisering, och när IDE:n?
 I C#-projekt skulle jag använda IDE:n, eftersom kompilatorn vet exakt vilka anrop som hör till en metod och säger till direkt om något missas. Python är dynamiskt, så där kan AI:n vara ett bättre val, särskilt när koden laddas på ovanliga sätt som IDE:n inte kan följa. Det beror också på hur stor refaktoriseringen är: gäller det bara en funktion i ett skript är IDE:n snabbast och säkrast.
