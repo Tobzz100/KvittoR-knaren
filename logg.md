@@ -98,6 +98,11 @@ Ja, efter en rättning: Alla kantfall från instruktionerna har tester, till exe
 
 
 Testar testerna verkligen något? Ändrades förväntade värden?		
+Testar de något: Ja. När jag lade in den trasiga funktionen blev tio tester röda och visade alla tre felen. Testet för ogiltig momssats var också rött tills funktionen rättades. Testerna fångar alltså fel på riktigt.
+
+Ändrades förväntade värden: Nej, inte för att få testerna gröna. När testerna delades upp per version flyttades värdena oförändrade till varje versions egen testfil. Det enda som ändrades var webbsajtens tester, när jag tog bort det ursprungliga .py-skriptet och bad AI:n ta bort det ur testerna också.
+
+
 Finns det säkerhetsrisker (hårdkodade värden, ovaliderad indata)?		
 Följer koden reglerna i din AGENTS.md?		
 Kan du förklara varje rad?
