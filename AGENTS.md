@@ -34,7 +34,7 @@ There is no build step or linter configured. `requirements.txt` lists the repo's
 
 ## Workflow rules
 
-- After any changes to the project, commit, but do not push.
+- After any changes to the project, commit, but do not push unless prompted.
 - For new small changes, ask before you add anything to the project.
 - Write or update the test py script when new logic is added.
 - Run the test before you are done.
