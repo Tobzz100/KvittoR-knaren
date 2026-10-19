@@ -11,10 +11,10 @@ EXCHANGE_RATES_TO_SEK = {
 }
 
 
-def main(shoppingList, moms, discount_code=None, target_currency="SEK"):
-
+def parse_shopping_list(shoppingList):
+    """Parse 'item price [currency]' entries into (name, price in SEK) tuples, skipping invalid ones."""
     items = shoppingList.split(",")
-    subtotal = 0
+    parsed = []
 
     while len(items) > 0:
         raw = items.pop(0).strip()
@@ -22,16 +22,24 @@ def main(shoppingList, moms, discount_code=None, target_currency="SEK"):
             continue
         tokens = raw.split(" ")
         currency = "SEK"
-        price_str = tokens[-1]
+        price_index = -1
         if len(tokens) >= 2 and tokens[-1].upper() in EXCHANGE_RATES_TO_SEK:
             currency = tokens[-1].upper()
-            price_str = tokens[-2]
+            price_index = -2
         try:
-            price = float(price_str)
+            price = float(tokens[price_index])
         except ValueError:
             print(f"Skipping invalid item: '{raw}'")
             continue
-        subtotal += price * EXCHANGE_RATES_TO_SEK[currency]
+        name = " ".join(t for t in tokens[:price_index] if t) or "Vara"
+        parsed.append((name, price * EXCHANGE_RATES_TO_SEK[currency]))
+
+    return parsed
+
+
+def main(shoppingList, moms, discount_code=None, target_currency="SEK"):
+
+    subtotal = sum(price_sek for _name, price_sek in parse_shopping_list(shoppingList))
 
     discount = DISCOUNT_CODES.get(discount_code, 0)
     subtotal_after_discount = subtotal * (1 - discount)
@@ -96,15 +104,13 @@ def format_receipt(items):
     return "\n".join(lines)
 
 
+DEFAULT_VAT_PERCENT = 25
 
 
 if __name__ == "__main__":
     shopping_list = input("Enter your shopping list as 'item price currency' pairs separated by commas (e.g. milk 10 SEK, bread 20 EUR, eggs 15): ")
-    discount_code = input("Enter a discount code (or leave blank): ").strip() or None
-    target_currency = input("Enter target currency SEK/EUR/USD (or leave blank for SEK): ").strip() or "SEK"
-    moms = 1.25
-    price = main(shopping_list, moms, discount_code, target_currency)
-    print(price)
+    items = [(name, price_sek, DEFAULT_VAT_PERCENT) for name, price_sek in parse_shopping_list(shopping_list)]
+    print(format_receipt(items))
 
 
 """

@@ -236,6 +236,41 @@ class TestMedClaudeFormatReceipt(unittest.TestCase):
         self.assertNotIn(".", receipt.replace("exkl.", ""))
 
 
+class TestMedClaudeCliReceipt(unittest.TestCase):
+    """med-claude's __main__ prints a receipt with 25 % moms on every item, prices converted to SEK."""
+
+    MODULE_PATH = os.path.join(VERSIONS["med-claude"]["folder"], "Kvittoräknaren.py")
+
+    def run_cli(self, shopping_list):
+        output = io.StringIO()
+        with patch("builtins.input", side_effect=[shopping_list]):
+            with redirect_stdout(output):
+                runpy.run_path(self.MODULE_PATH, run_name="__main__")
+        return output.getvalue()
+
+    def test_parse_shopping_list_returns_names_and_sek_prices(self):
+        parsed = MODULES["med-claude"].parse_shopping_list("milk 10 SEK, bred 25 EUR, eggs 12, trasig xyz")
+        self.assertEqual(parsed, [("milk", 10.0), ("bred", 287.5), ("eggs", 12.0)])
+
+    def test_cli_prints_receipt_with_25_percent_moms(self):
+        output = self.run_cli("milk 10 SEK, bred 25 EUR, eggs 12")
+        expected = "\n".join([
+            "KVITTO",
+            "milk                      10,00",
+            "bred                     287,50",
+            "eggs                      12,00",
+            "-------------------------------",
+            "Summa exkl. moms         309,50",
+            "Moms 25 %                 77,38",
+            "-------------------------------",
+            "ATT BETALA               386,88",
+        ])
+        self.assertIn(expected, output)
+
+    def test_cli_with_empty_list_prints_inga_varor(self):
+        self.assertIn("Inga varor", self.run_cli(""))
+
+
 if __name__ == "__main__":
     unittest.main()
 
