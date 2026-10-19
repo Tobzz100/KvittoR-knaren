@@ -247,6 +247,11 @@ class TestMedClaudeVatBreakdown(unittest.TestCase):
         items = [("Kaffe", 100, 25), ("Bröd", 50, 12), ("Bok", 200, 6)]
         self.assertEqual(self.vat_breakdown(items), {25: Decimal("25.00"), 12: Decimal("6.00"), 6: Decimal("12.00")})
 
+    def test_kaffe_100kr_25_percent_and_brod_50kr_12_percent(self):
+        # kaffe 100 kr * 25 % = 25 kr moms, bröd 50 kr * 12 % = 6 kr moms
+        items = [("Kaffe", 100, 25), ("Bröd", 50, 12)]
+        self.assertEqual(self.vat_breakdown(items), {25: 25, 12: 6})
+
     def test_items_with_same_rate_are_summed(self):
         items = [("Kaffe", 100, 25), ("Te", 40, 25)]
         self.assertEqual(self.vat_breakdown(items), {25: Decimal("35.00")})
