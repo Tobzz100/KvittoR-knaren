@@ -49,3 +49,21 @@ För varje scenario: välj vilken typ av AI-kompis (eller ingen alls) du skulle 
 5. Jag skulle kunna använda OpenCode och testa modeller själv (Har inte testat detta, men vet att man kan det.). Eller så hade jag kunnat fråga ChatGPT eller en annan AI om en lista med bra gratis alternativ för AI-modeller som ska hantera kod. Sen be den förklara vad som är bra eller bättre mellan dem och be om källor. Jag hade kikat på källorna för att vara säker på att den har hittat rätt info.
 
 6. Behöver inte AI för detta, det finns redan bra verktyg för att automatiskt lägga till konstruktor och getters. Med det sagt så kan det vara snabbare att bara använda en AI för att skapa det åt mig. 
+
+
+
+
+
+# Modul 3 - Övning 2 Momsbuggen
+
+Hur många fel hittade du till slut i funktionen?
+Hittade AI:n alla själv, eller bara det fel som ditt första test visade?
+Vad säger det om hur du ska testa kod som AI:n har lagat?
+
+
+Jag hittade två fel i den trasiga funktionen. Den hoppade över den första varan, eftersom loopen började på index 1 i stället för 0. Den saknade också stöd för 6 % moms.
+
+Jag hade ingen funktion som räknade ut momsen, så jag bad AI:n skapa en som jag sedan kunde byta ut mot den trasiga. När jag bytte till den trasiga varianten fick jag fler problem, eftersom den returnerade sitt resultat i ett annat format än mina tester förväntade sig. Jag bad AI:n anpassa formatet utan att ändra själva funktionen. Sedan bad jag den förklara vad som var fel med funktionen, och den beskrev felen den hade hittat. Till sist bad jag den rätta funktionen, vilket gick utan problem. Den nya funktionen räknar ut momsen utifrån varje varas egen momssats, så tekniskt sett kan den hantera vilken momssats som helst.
+
+
+
