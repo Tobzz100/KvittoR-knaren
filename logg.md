@@ -93,10 +93,10 @@ Har nya beroenden lagts till?
 
 Nej: Vi körde git diff mot dagens första commit (git diff 2442f83 -- requirements.txt) och requirements.txt har inte ändrats, den innehåller fortfarande bara Flask. Vi gick också igenom de nya importraderna i diffen. Alla kommer från Pythons standardbibliotek (till exempel decimal, unittest och os), som inte behöver installeras, eller från projektets egen fil kvitto_testrunner.py. Inget nytt paket behöver installeras med pip.
 		
-
-
-
 Hanteras kantfall och felaktig indata?		
+Delvis: Alla kantfall från instruktionerna har tester, till exempel tom lista, för långa varunamn, ogiltig momssats och avrundning. Jag bad också AI:n att prova annan felaktig indata, och då hittade vi några fall som koden inte hanterar: "nan" och "inf" godtas som pris (kvittot visar då NaN), negativa priser godtas och ger negativ moms, och ett pris som text ger ett otydligt fel. Dessa fall har inga tester än.
+
+
 Testar testerna verkligen något? Ändrades förväntade värden?		
 Finns det säkerhetsrisker (hårdkodade värden, ovaliderad indata)?		
 Följer koden reglerna i din AGENTS.md?		
