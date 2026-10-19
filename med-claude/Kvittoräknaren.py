@@ -1,4 +1,5 @@
-from decimal import Decimal, ROUND_HALF_UP
+import math
+from decimal import Decimal, InvalidOperation, ROUND_HALF_UP
 
 DISCOUNT_CODES = {
     "RABATT10": 0.10,
@@ -29,6 +30,10 @@ def parse_shopping_list(shoppingList):
         try:
             price = float(tokens[price_index])
         except ValueError:
+            print(f"Skipping invalid item: '{raw}'")
+            continue
+        if not math.isfinite(price) or price < 0:
+            # float() accepts "nan" and "inf", and negative prices make no sense here
             print(f"Skipping invalid item: '{raw}'")
             continue
         name = " ".join(t for t in tokens[:price_index] if t) or "Vara"
@@ -65,6 +70,17 @@ def _to_decimal(value):
     return Decimal(str(value))
 
 
+def _to_price(value):
+    """Convert a price to Decimal, raising ValueError unless it is a finite number >= 0."""
+    try:
+        price = _to_decimal(value)
+    except InvalidOperation:
+        raise ValueError(f"Ogiltigt pris: {value!r}. Priset måste vara ett tal.") from None
+    if not price.is_finite() or price < 0:
+        raise ValueError(f"Ogiltigt pris: {value!r}. Priset måste vara ett tal som är 0 eller större.")
+    return price
+
+
 def _format_amount(amount):
     """Format an amount with two decimals and a decimal comma, e.g. 1234.5 -> '1234,50'."""
     rounded = amount.quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
@@ -90,7 +106,7 @@ def vat_breakdown(items):
         rate = _to_decimal(vat_percent)
         if rate not in VAT_RATES:
             raise ValueError(f"Ogiltig momssats: {vat_percent} %. Tillåtna: 25, 12, 6 och 0 %.")
-        net_per_rate[rate] = net_per_rate.get(rate, Decimal("0")) + _to_decimal(price)
+        net_per_rate[rate] = net_per_rate.get(rate, Decimal("0")) + _to_price(price)
 
     breakdown = {}
     for rate in sorted(net_per_rate, reverse=True):
@@ -108,7 +124,7 @@ def format_receipt(items):
     subtotal = Decimal("0")
 
     for name, price, _vat_percent in items:
-        price = _to_decimal(price)
+        price = _to_price(price)
         if len(name) > MAX_NAME_LENGTH:
             name = name[:MAX_NAME_LENGTH - 3] + "..."
         lines.append(_receipt_line(name, price))

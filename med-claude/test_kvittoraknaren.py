@@ -175,6 +175,40 @@ class TestVatBreakdown(unittest.TestCase):
                     kvitto.vat_breakdown([("Kaffe", 100, 25), ("Konstig vara", 100, rate)])
 
 
+class TestInvalidPrices(unittest.TestCase):
+    """nan, inf, negative and non-numeric prices are rejected instead of giving NaN or negative VAT."""
+
+    INVALID_PRICES = (float("nan"), float("inf"), -100, "abc")
+
+    def test_parse_shopping_list_skips_nan_inf_and_negative_prices(self):
+        with redirect_stdout(io.StringIO()) as out:
+            parsed = kvitto.parse_shopping_list("mjölk nan, ost inf, bröd -50, smör -5 EUR, kaffe 100")
+        self.assertEqual(parsed, [("kaffe", 100.0)])
+        self.assertEqual(out.getvalue().count("Skipping invalid item"), 4)
+
+    def test_parse_shopping_list_allows_zero_price(self):
+        self.assertEqual(kvitto.parse_shopping_list("gratisprov 0"), [("gratisprov", 0.0)])
+
+    def test_main_ignores_nan_and_negative_prices(self):
+        with redirect_stdout(io.StringIO()):
+            self.assertEqual(kvitto.main("vara1 100, vara2 nan, vara3 -50", 1.25), 125)
+
+    def test_vat_breakdown_rejects_invalid_prices_with_value_error(self):
+        for price in self.INVALID_PRICES:
+            with self.subTest(price=price):
+                with self.assertRaisesRegex(ValueError, "Ogiltigt pris"):
+                    kvitto.vat_breakdown([("Kaffe", 100, 25), ("Konstig vara", price, 25)])
+
+    def test_format_receipt_rejects_invalid_prices_with_value_error(self):
+        for price in self.INVALID_PRICES:
+            with self.subTest(price=price):
+                with self.assertRaisesRegex(ValueError, "Ogiltigt pris"):
+                    kvitto.format_receipt([("Konstig vara", price, 25)])
+
+    def test_zero_price_is_valid(self):
+        self.assertEqual(kvitto.vat_breakdown([("Gratisprov", 0, 25)]), {25: Decimal("0.00")})
+
+
 class TestCliReceipt(unittest.TestCase):
     """__main__ prints a receipt with 25 % moms on every item, prices converted to SEK."""
 
