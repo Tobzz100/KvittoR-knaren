@@ -73,15 +73,19 @@ def _receipt_line(label, amount):
 
 
 def vat_breakdown(items):
-    """Returnerar momsbelopp per momssats, t.ex. {25: 25.0, 12: 6.0}."""
+    """Returnerar momsbelopp per momssats, högsta sats först, t.ex. {25: 25.00, 12: 6.00}.
+
+    Beloppen är Decimal avrundade till två decimaler.
+    """
+    net_per_rate = {}
+    for _name, price, vat_percent in items:
+        rate = _to_decimal(vat_percent)
+        net_per_rate[rate] = net_per_rate.get(rate, Decimal("0")) + _to_decimal(price)
+
     breakdown = {}
-    for i in range(1, len(items)):
-        name, price, rate = items[i]
-        if rate == 25:
-            vat = price * 0.25
-        else:
-            vat = price * 0.12
-        breakdown[rate] = breakdown.get(rate, 0) + vat
+    for rate in sorted(net_per_rate, reverse=True):
+        vat = net_per_rate[rate] * rate / 100
+        breakdown[rate] = vat.quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
     return breakdown
 
 
