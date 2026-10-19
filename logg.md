@@ -85,7 +85,10 @@ AI:n påpekade också att 0 % moms borde vara med, eftersom den momssatsen ocks�
 Kör git diff main (eller master) för att se allt som ändrats under dagen. Gå igenom koden med checklistan och fyll i tabellen. Skriv en kort kommentar för varje rad, även när svaret är ”OK”.
 
 
-Finns alla funktioner och bibliotek som anropas?
+Finns alla funktioner och bibliotek som anropas? 
+
+Ja: Jag gick igenom VS Code och titta att alla functioner i kvittoräknaren finns, samt bibloteken. Jag bad också AI att gå igenom efter, för att vara extra säker. 
+
 Har nya beroenden lagts till?
 		
 
