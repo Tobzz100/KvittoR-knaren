@@ -73,4 +73,11 @@ Mitt första test (kaffe 100 kr med 25 % och bröd 50 kr med 12 %) visade bara e
 Slutsatsen är att ett enda test bara fångar det fel det råkar träffa. När AI:n har lagat kod räcker det inte att det test som först misslyckades blir grönt. Testerna behöver täcka alla momssatser (25, 12 och 6 %), flera varor med samma momssats, decimalbelopp som måste avrundas och en tom lista. Det är också bra att köra hela testsviten efter lagningen, inte bara det test som visade felet.
 
 
+# Uppslagstabell för momssatser
+
+Uppgiften var att byta ut if-satserna i vat_breakdown mot en uppslagstabell. Den rättade funktionen hade redan inga if-satser kvar, eftersom den räknade momsen direkt från varje varas momssats, men den hade ingen tabell heller. Jag bad AI:n först skriva ett test som kräver att en ogiltig momssats ger ett fel. Testet blev rött, och sedan lade AI:n till en uppslagstabell med de tillåtna satserna så att testet blev grönt. Nu ger en momssats som inte finns i tabellen ett ValueError, så funktionen kan inte längre hantera vilken sats som helst.
+
+AI:n påpekade också att 0 % moms borde vara med, eftersom den momssatsen också finns i Sverige, till exempel för viss export och sjukvård. Jag hade bara tänkt på 25, 12 och 6 %. Därför finns 0 % med i tabellen och har ett eget test.
+
+
 

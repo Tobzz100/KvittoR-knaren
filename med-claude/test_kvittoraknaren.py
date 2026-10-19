@@ -158,6 +158,11 @@ class TestVatBreakdown(unittest.TestCase):
     def test_empty_list_gives_empty_breakdown(self):
         self.assertEqual(kvitto.vat_breakdown([]), {})
 
+    def test_zero_percent_vat_is_valid_and_gives_zero_vat(self):
+        # 0 % moms finns i Sverige (t.ex. viss export och sjukvård)
+        items = [("Kaffe", 100, 25), ("Export", 300, 0)]
+        self.assertEqual(kvitto.vat_breakdown(items), {25: Decimal("25.00"), 0: Decimal("0.00")})
+
     def test_invalid_vat_rate_raises_value_error(self):
         # Sverige har bara momssatserna 25, 12 och 6 %; alla andra satser ska ge ett fel
         for rate in (20, 12.5, -6):

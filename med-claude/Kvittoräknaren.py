@@ -49,6 +49,14 @@ def main(shoppingList, moms, discount_code=None, target_currency="SEK"):
     return total_sek / EXCHANGE_RATES_TO_SEK[target_currency]
 
 
+# Svenska momssatser i procent -> andel av priset exkl. moms
+VAT_RATES = {
+    25: Decimal("0.25"),
+    12: Decimal("0.12"),
+    6: Decimal("0.06"),
+    0: Decimal("0"),
+}
+
 RECEIPT_WIDTH = 31
 MAX_NAME_LENGTH = 20
 
@@ -80,11 +88,13 @@ def vat_breakdown(items):
     net_per_rate = {}
     for _name, price, vat_percent in items:
         rate = _to_decimal(vat_percent)
+        if rate not in VAT_RATES:
+            raise ValueError(f"Ogiltig momssats: {vat_percent} %. Tillåtna: 25, 12, 6 och 0 %.")
         net_per_rate[rate] = net_per_rate.get(rate, Decimal("0")) + _to_decimal(price)
 
     breakdown = {}
     for rate in sorted(net_per_rate, reverse=True):
-        vat = net_per_rate[rate] * rate / 100
+        vat = net_per_rate[rate] * VAT_RATES[rate]
         breakdown[rate] = vat.quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
     return breakdown
 
