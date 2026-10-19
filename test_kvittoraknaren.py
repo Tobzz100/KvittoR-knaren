@@ -4,6 +4,7 @@ import os
 import runpy
 import unittest
 from contextlib import redirect_stdout
+from decimal import Decimal
 from unittest.mock import patch
 
 REPO_ROOT = os.path.dirname(__file__)
@@ -234,6 +235,33 @@ class TestMedClaudeFormatReceipt(unittest.TestCase):
         self.assertIn("Moms 12 %                  2,39", receipt)
         self.assertIn("ATT BETALA                22,29", receipt)
         self.assertNotIn(".", receipt.replace("exkl.", ""))
+
+
+class TestMedClaudeVatBreakdown(unittest.TestCase):
+    """med-claude's vat_breakdown() returns {VAT rate: VAT amount}, highest rate first."""
+
+    def vat_breakdown(self, items):
+        return MODULES["med-claude"].vat_breakdown(items)
+
+    def test_example_items_give_vat_per_rate(self):
+        items = [("Kaffe", 100, 25), ("Bröd", 50, 12), ("Bok", 200, 6)]
+        self.assertEqual(self.vat_breakdown(items), {25: Decimal("25.00"), 12: Decimal("6.00"), 6: Decimal("12.00")})
+
+    def test_items_with_same_rate_are_summed(self):
+        items = [("Kaffe", 100, 25), ("Te", 40, 25)]
+        self.assertEqual(self.vat_breakdown(items), {25: Decimal("35.00")})
+
+    def test_rates_are_ordered_highest_first(self):
+        items = [("Bok", 100, 6), ("Kaffe", 100, 25), ("Bröd", 100, 12)]
+        self.assertEqual(list(self.vat_breakdown(items)), [25, 12, 6])
+
+    def test_vat_is_rounded_half_up_to_two_decimals(self):
+        # 19,90 * 12 % = 2,388 -> 2,39; 0,10 * 25 % = 0,025 -> 0,03
+        self.assertEqual(self.vat_breakdown([("Godis", 19.9, 12)]), {12: Decimal("2.39")})
+        self.assertEqual(self.vat_breakdown([("Tuggummi", 0.1, 25)]), {25: Decimal("0.03")})
+
+    def test_empty_list_gives_empty_breakdown(self):
+        self.assertEqual(self.vat_breakdown([]), {})
 
 
 class TestMedClaudeCliReceipt(unittest.TestCase):

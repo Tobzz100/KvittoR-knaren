@@ -72,6 +72,24 @@ def _receipt_line(label, amount):
     return label + _format_amount(amount).rjust(RECEIPT_WIDTH - len(label))
 
 
+def vat_breakdown(items):
+    """Return the VAT per rate for (name, price excl. VAT, VAT rate in percent) items.
+
+    The result maps each VAT rate that occurs to its VAT amount rounded to two decimals,
+    ordered highest rate first, e.g. {Decimal('25'): Decimal('25.00'), Decimal('6'): Decimal('12.00')}.
+    """
+    net_per_rate = {}
+    for _name, price, vat_percent in items:
+        rate = _to_decimal(vat_percent)
+        net_per_rate[rate] = net_per_rate.get(rate, Decimal("0")) + _to_decimal(price)
+
+    breakdown = {}
+    for rate in sorted(net_per_rate, reverse=True):
+        vat = net_per_rate[rate] * rate / 100
+        breakdown[rate] = vat.quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+    return breakdown
+
+
 def format_receipt(items):
     """Return a receipt as text for a list of (name, price excl. VAT, VAT rate in percent)."""
     if not items:
@@ -79,23 +97,19 @@ def format_receipt(items):
 
     lines = ["KVITTO"]
     subtotal = Decimal("0")
-    net_per_rate = {}
 
-    for name, price, vat_percent in items:
+    for name, price, _vat_percent in items:
         price = _to_decimal(price)
-        rate = _to_decimal(vat_percent)
         if len(name) > MAX_NAME_LENGTH:
             name = name[:MAX_NAME_LENGTH - 3] + "..."
         lines.append(_receipt_line(name, price))
         subtotal += price
-        net_per_rate[rate] = net_per_rate.get(rate, Decimal("0")) + price
 
     lines.append("-" * RECEIPT_WIDTH)
     lines.append(_receipt_line("Summa exkl. moms", subtotal))
 
     total = subtotal
-    for rate in sorted(net_per_rate, reverse=True):
-        vat = (net_per_rate[rate] * rate / 100).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+    for rate, vat in vat_breakdown(items).items():
         lines.append(_receipt_line(f"Moms {_format_rate(rate)} %", vat))
         total += vat
 
