@@ -7,7 +7,6 @@ from kvitto_testrunner import ReportRunner
 REPO_ROOT = os.path.dirname(__file__)
 
 VERSIONS = {
-    "root": {"folder": REPO_ROOT, "supports_discount": False, "supports_currency": False},
     "med-claude": {"folder": os.path.join(REPO_ROOT, "med-claude"), "supports_discount": True, "supports_currency": True},
     "med-copilot": {"folder": os.path.join(REPO_ROOT, "med-copilot"), "supports_discount": True, "supports_currency": True},
     "med-opencode": {"folder": os.path.join(REPO_ROOT, "med-opencode"), "supports_discount": True, "supports_currency": True},

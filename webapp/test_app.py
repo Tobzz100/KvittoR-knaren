@@ -17,18 +17,18 @@ class TestWebApp(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIn(b"Kvittor", response.data)
 
-    def test_versions_endpoint_returns_four_versions(self):
+    def test_versions_endpoint_returns_three_versions(self):
         response = self.client.get("/api/versions")
         self.assertEqual(response.status_code, 200)
         data = response.get_json()
-        self.assertEqual(len(data), 4)
+        self.assertEqual(len(data), 3)
         keys = {entry["key"] for entry in data}
-        self.assertEqual(keys, {"root", "med-claude", "med-copilot", "med-opencode"})
+        self.assertEqual(keys, {"med-claude", "med-copilot", "med-opencode"})
 
-    def test_calculate_root_two_items_25_percent(self):
+    def test_calculate_two_items_25_percent(self):
         response = self.client.post(
             "/api/calculate",
-            json={"version": "root", "shopping_list": "vara1 100, vara2 100", "moms": 25},
+            json={"version": "med-opencode", "shopping_list": "vara1 100, vara2 100", "moms": 25},
         )
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.get_json()["result"], 250)
@@ -123,20 +123,17 @@ class TestWebApp(unittest.TestCase):
         response = self.client.post("/api/test/med-unknown")
         self.assertEqual(response.status_code, 404)
 
-    def test_run_tests_root_passes(self):
+    def test_run_tests_removed_root_version_returns_404(self):
         response = self.client.post("/api/test/root")
-        self.assertEqual(response.status_code, 200)
-        data = response.get_json()
-        self.assertTrue(data["passed"])
-        self.assertEqual(data["returncode"], 0)
-        self.assertIn("test_kvittoraknaren.py", data["output"])
-        self.assertNotIn("med-claude", data["output"])
+        self.assertEqual(response.status_code, 404)
 
     def test_run_tests_version_runs_shared_and_its_own_tests_only(self):
         response = self.client.post("/api/test/med-claude")
         self.assertEqual(response.status_code, 200)
         data = response.get_json()
         self.assertTrue(data["passed"])
+        self.assertEqual(data["returncode"], 0)
+        self.assertIn("== test_kvittoraknaren.py ==", data["output"])
         self.assertIn(os.path.join("med-claude", "test_kvittoraknaren.py"), data["output"])
         self.assertNotIn("med-copilot", data["output"])
         self.assertNotIn("med-opencode", data["output"])

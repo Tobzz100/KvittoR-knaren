@@ -9,16 +9,6 @@ APP_DIR = os.path.dirname(__file__)
 
 VERSIONS = [
     {
-        "key": "root",
-        "label": "Baseline (original)",
-        "folder": "..",
-        "supports_discount": False,
-        "supports_currency": False,
-        "currency_param": None,
-        "list_help": "Comma-separated 'item price' pairs, e.g. milk 10, bread 20",
-        "quirk": "No discount or currency support; VAT is applied per item inside the loop.",
-    },
-    {
         "key": "med-claude",
         "label": "Claude",
         "folder": "../med-claude",
@@ -137,7 +127,7 @@ def api_calculate():
 
 @app.route("/api/test/<version>", methods=["POST"])
 def api_test(version):
-    # Runs the shared tests at the repo root (behavior all four versions agree on)
+    # Runs the shared tests at the repo root (behavior all versions agree on)
     # plus the selected version's own test file in its folder, if it has one.
     entry = get_version(version)
     if entry is None:
@@ -146,7 +136,7 @@ def api_test(version):
     repo_root = os.path.join(APP_DIR, "..")
     test_files = [os.path.join(repo_root, "test_kvittoraknaren.py")]
     version_test_file = os.path.join(version_folder_abs(entry), "test_kvittoraknaren.py")
-    if os.path.abspath(version_test_file) != os.path.abspath(test_files[0]) and os.path.exists(version_test_file):
+    if os.path.exists(version_test_file):
         test_files.append(version_test_file)
 
     outputs = []
