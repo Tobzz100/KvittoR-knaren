@@ -133,11 +133,8 @@ def format_receipt(items):
     lines.append("-" * RECEIPT_WIDTH)
     lines.append(_receipt_line("Summa exkl. moms", subtotal))
 
-    # vat_breakdown() may return plain ints/floats in any order, so normalize to Decimal and sort here.
-    breakdown = {_to_decimal(rate): _to_decimal(vat) for rate, vat in vat_breakdown(items).items()}
     total = subtotal
-    for rate in sorted(breakdown, reverse=True):
-        vat = breakdown[rate].quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+    for rate, vat in vat_breakdown(items).items():
         lines.append(_receipt_line(f"Moms {_format_rate(rate)} %", vat))
         total += vat
 
