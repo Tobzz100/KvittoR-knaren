@@ -1,7 +1,9 @@
 import importlib.util
+import io
 import os
 import subprocess
 import sys
+from contextlib import redirect_stdout
 
 from flask import Flask, jsonify, render_template, request
 
@@ -12,18 +14,20 @@ VERSIONS = [
         "key": "med-claude",
         "label": "Claude",
         "folder": "../med-claude",
+        "uses_inventory": True,
         "supports_discount": True,
         "supports_currency": True,
         "currency_param": "target_currency",
         "list_help": "Comma-separated 'item price [CURRENCY]' pairs, e.g. milk 10 SEK, bread 20 EUR, eggs 15",
-        "quirk": "Supports per-item currency and converts the total to your target currency "
-        "- but an unsupported target currency crashes with an internal error "
-        "(shown here as a friendly message instead).",
+        "quirk": "Pick items from its inventory: price and VAT rate per item come from the inventory, "
+        "so they can't be typed in, and you get a full receipt with VAT per rate. "
+        "The discount code must match exactly - 'rabatt10' gives no discount.",
     },
     {
         "key": "med-copilot",
         "label": "Copilot",
         "folder": "../med-copilot",
+        "uses_inventory": False,
         "supports_discount": True,
         "supports_currency": True,
         "currency_param": "currency",
@@ -35,6 +39,7 @@ VERSIONS = [
         "key": "med-opencode",
         "label": "OpenCode",
         "folder": "../med-opencode",
+        "uses_inventory": False,
         "supports_discount": True,
         "supports_currency": True,
         "currency_param": "currency",
@@ -68,6 +73,7 @@ def public_version_info(entry):
     return {
         "key": entry["key"],
         "label": entry["label"],
+        "uses_inventory": entry["uses_inventory"],
         "supports_discount": entry["supports_discount"],
         "supports_currency": entry["supports_currency"],
         "currency_param": entry["currency_param"],
@@ -123,6 +129,52 @@ def api_calculate():
         return jsonify({"error": f"Unexpected error: {error}"}), 400
 
     return jsonify({"result": result})
+
+
+@app.route("/api/inventory/<version>")
+def api_inventory(version):
+    entry = get_version(version)
+    if entry is None or not entry["uses_inventory"]:
+        return jsonify({"error": "This version has no inventory"}), 404
+
+    module = load_version_module(entry)
+    return jsonify(
+        [
+            {"name": name, "price": price, "vat_percent": vat_percent}
+            for name, (price, vat_percent) in module.INVENTORY.items()
+        ]
+    )
+
+
+@app.route("/api/receipt", methods=["POST"])
+def api_receipt():
+    # Same flow as the version's CLI: item names are looked up in its inventory,
+    # so price and VAT rate never come from the browser.
+    data = request.get_json(silent=True) or {}
+
+    entry = get_version(data.get("version"))
+    if entry is None or not entry["uses_inventory"]:
+        return jsonify({"error": "This version has no inventory"}), 400
+
+    names = data.get("items", [])
+    if not isinstance(names, list) or not all(isinstance(name, str) for name in names):
+        return jsonify({"error": "Items must be a list of item names"}), 400
+
+    discount_code = data.get("discount_code") or ""
+    if not isinstance(discount_code, str):
+        return jsonify({"error": "Discount code must be text"}), 400
+
+    # warnings (unknown item, unknown discount code) are printed by the version, so capture them
+    output = io.StringIO()
+    try:
+        module = load_version_module(entry)
+        with redirect_stdout(output):
+            items = module.items_from_inventory(", ".join(names))
+            receipt = module.format_receipt(items, module.lookup_discount(discount_code))
+    except ValueError as error:
+        return jsonify({"error": str(error)}), 400
+
+    return jsonify({"receipt": receipt, "messages": output.getvalue().splitlines()})
 
 
 @app.route("/api/test/<version>", methods=["POST"])

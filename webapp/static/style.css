@@ -87,6 +87,76 @@ button {
   color: #146c2e;
 }
 
+#result.warning {
+  color: #8a5a00;
+  font-size: 0.95rem;
+  white-space: pre-line;
+}
+
+.inventory {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(9rem, 1fr));
+  gap: 0.5rem;
+}
+
+.item-button {
+  margin-top: 0;
+  padding: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+}
+
+.item-name {
+  font-weight: 600;
+}
+
+.item-price {
+  font-size: 0.85rem;
+  color: #555;
+}
+
+#cart {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+#cart li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.25rem 0;
+  border-bottom: 1px solid #eee;
+}
+
+#cart li.empty {
+  color: #666;
+  border-bottom: none;
+}
+
+#cart li button {
+  margin-top: 0;
+  padding: 0.1rem 0.6rem;
+}
+
+#receipt {
+  margin-top: 1rem;
+  padding: 0.75rem;
+  background: #fffdf5;
+  border: 1px dashed #bbb;
+  border-radius: 6px;
+  font-family: ui-monospace, Consolas, monospace;
+  width: max-content;
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+#receipt.hidden {
+  display: none;
+}
+
 #test-status {
   margin-top: 0.5rem;
   font-weight: 600;

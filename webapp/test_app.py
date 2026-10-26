@@ -119,6 +119,66 @@ class TestWebApp(unittest.TestCase):
         )
         self.assertEqual(response.status_code, 400)
 
+    def test_only_med_claude_uses_inventory(self):
+        data = self.client.get("/api/versions").get_json()
+        self.assertEqual({entry["key"]: entry["uses_inventory"] for entry in data}, {
+            "med-claude": True,
+            "med-copilot": False,
+            "med-opencode": False,
+        })
+
+    def test_inventory_lists_items_with_price_and_vat_rate(self):
+        response = self.client.get("/api/inventory/med-claude")
+        self.assertEqual(response.status_code, 200)
+        items = response.get_json()
+        self.assertIn({"name": "Mjölk", "price": 15, "vat_percent": 12}, items)
+        self.assertIn({"name": "Bok", "price": 200, "vat_percent": 6}, items)
+
+    def test_inventory_for_version_without_one_returns_404(self):
+        self.assertEqual(self.client.get("/api/inventory/med-copilot").status_code, 404)
+        self.assertEqual(self.client.get("/api/inventory/med-unknown").status_code, 404)
+
+    def test_receipt_uses_inventory_prices_and_discount(self):
+        response = self.client.post(
+            "/api/receipt",
+            json={"version": "med-claude", "items": ["Mjölk", "Bok", "Tvål"], "discount_code": "RABATT10"},
+        )
+        self.assertEqual(response.status_code, 200)
+        data = response.get_json()
+        self.assertIn("Rabatt 10 %              -23,50", data["receipt"])
+        self.assertIn("ATT BETALA               228,42", data["receipt"])
+        self.assertEqual(data["messages"], [])
+
+    def test_receipt_skips_unknown_items_with_message(self):
+        response = self.client.post("/api/receipt", json={"version": "med-claude", "items": ["Mjölk", "Guld"]})
+        data = response.get_json()
+        self.assertEqual(data["messages"], ["Skipping unknown item: 'Guld'"])
+        self.assertNotIn("Guld", data["receipt"])
+        self.assertIn("ATT BETALA                16,80", data["receipt"])
+
+    def test_receipt_unknown_discount_code_gives_message_and_full_price(self):
+        response = self.client.post(
+            "/api/receipt",
+            json={"version": "med-claude", "items": ["Mjölk"], "discount_code": "FINNSINTE"},
+        )
+        data = response.get_json()
+        self.assertEqual(data["messages"], ["Discount code 'FINNSINTE' does not exist, no discount applied"])
+        self.assertIn("ATT BETALA                16,80", data["receipt"])
+
+    def test_receipt_with_empty_cart_gives_inga_varor(self):
+        response = self.client.post("/api/receipt", json={"version": "med-claude", "items": []})
+        self.assertEqual(response.get_json()["receipt"], "Inga varor")
+
+    def test_receipt_rejects_bad_input(self):
+        for payload in (
+            {"version": "med-copilot", "items": ["Mjölk"]},
+            {"version": "med-claude", "items": "Mjölk"},
+            {"version": "med-claude", "items": [1]},
+            {"version": "med-claude", "items": ["Mjölk"], "discount_code": ["RABATT10"]},
+        ):
+            with self.subTest(payload=payload):
+                self.assertEqual(self.client.post("/api/receipt", json=payload).status_code, 400)
+
     def test_run_tests_unknown_version_returns_404(self):
         response = self.client.post("/api/test/med-unknown")
         self.assertEqual(response.status_code, 404)
