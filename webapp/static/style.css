@@ -114,7 +114,9 @@ button {
 
 .item-price {
   font-size: 0.85rem;
-  color: #555;
+  /* follow the button's own text color, so it stays readable whether the button is light or dark */
+  color: inherit;
+  opacity: 0.85;
 }
 
 #cart {
