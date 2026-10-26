@@ -25,6 +25,11 @@ class TestDiscountCode(unittest.TestCase):
         result = kvitto.main("vara1 100", 1.25, " rabatt10 ")
         self.assertEqual(result, 125)
 
+    def test_unknown_discount_code_gives_no_discount(self):
+        # koden finns inte i DISCOUNT_CODES, så ingen rabatt dras och inget fel kastas
+        result = kvitto.main("vara1 100", 1.25, "FINNSINTE")
+        self.assertEqual(result, 125)
+
 
 class TestCurrency(unittest.TestCase):
 
