@@ -22,13 +22,23 @@ class TestDiscountCode(unittest.TestCase):
     def test_discount_is_case_sensitive_exact_match_only(self):
         # bug/quirk: med-claude does a literal dict lookup with no strip/upper,
         # so " rabatt10 " never matches "RABATT10" and no discount is applied
-        result = kvitto.main("vara1 100", 1.25, " rabatt10 ")
+        with redirect_stdout(io.StringIO()):
+            result = kvitto.main("vara1 100", 1.25, " rabatt10 ")
         self.assertEqual(result, 125)
 
-    def test_unknown_discount_code_gives_no_discount(self):
-        # koden finns inte i DISCOUNT_CODES, så ingen rabatt dras och inget fel kastas
-        result = kvitto.main("vara1 100", 1.25, "FINNSINTE")
+    def test_unknown_discount_code_gives_no_discount_and_prints_message(self):
+        # koden finns inte i DISCOUNT_CODES, så ett meddelande skrivs ut och fullt pris returneras
+        with redirect_stdout(io.StringIO()) as out:
+            result = kvitto.main("vara1 100", 1.25, "FINNSINTE")
         self.assertEqual(result, 125)
+        self.assertIn("Discount code 'FINNSINTE' does not exist, no discount applied", out.getvalue())
+
+    def test_valid_or_missing_discount_code_prints_no_message(self):
+        for code in ("RABATT10", None, ""):
+            with self.subTest(code=code):
+                with redirect_stdout(io.StringIO()) as out:
+                    kvitto.main("vara1 100", 1.25, code)
+                self.assertEqual(out.getvalue(), "")
 
 
 class TestCurrency(unittest.TestCase):

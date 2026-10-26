@@ -47,6 +47,8 @@ def main(shoppingList, moms, discount_code=None, target_currency="SEK"):
     subtotal = sum(price_sek for _name, price_sek in parse_shopping_list(shoppingList))
 
     discount = DISCOUNT_CODES.get(discount_code, 0)
+    if discount_code and discount_code not in DISCOUNT_CODES:
+        print(f"Discount code '{discount_code}' does not exist, no discount applied")
     subtotal_after_discount = subtotal * (1 - discount)
     total_sek = subtotal_after_discount * moms
 
