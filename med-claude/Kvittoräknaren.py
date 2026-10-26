@@ -42,13 +42,21 @@ def parse_shopping_list(shoppingList):
     return parsed
 
 
+def lookup_discount(discount_code):
+    """Return the discount for a code (e.g. 0.10), or 0 with a printed message if the code doesn't exist."""
+    if not discount_code:
+        return 0
+    if discount_code not in DISCOUNT_CODES:
+        print(f"Discount code '{discount_code}' does not exist, no discount applied")
+        return 0
+    return DISCOUNT_CODES[discount_code]
+
+
 def main(shoppingList, moms, discount_code=None, target_currency="SEK"):
 
     subtotal = sum(price_sek for _name, price_sek in parse_shopping_list(shoppingList))
 
-    discount = DISCOUNT_CODES.get(discount_code, 0)
-    if discount_code and discount_code not in DISCOUNT_CODES:
-        print(f"Discount code '{discount_code}' does not exist, no discount applied")
+    discount = lookup_discount(discount_code)
     subtotal_after_discount = subtotal * (1 - discount)
     total_sek = subtotal_after_discount * moms
 
@@ -117,8 +125,11 @@ def vat_breakdown(items):
     return breakdown
 
 
-def format_receipt(items):
-    """Return a receipt as text for a list of (name, price excl. VAT, VAT rate in percent)."""
+def format_receipt(items, discount=0):
+    """Return a receipt as text for a list of (name, price excl. VAT, VAT rate in percent).
+
+    discount is a fraction (e.g. 0.10) taken off every price excl. VAT, rounded to öre, before VAT is calculated.
+    """
     if not items:
         return "Inga varor"
 
@@ -133,6 +144,18 @@ def format_receipt(items):
         subtotal += price
 
     lines.append("-" * RECEIPT_WIDTH)
+
+    discount = _to_decimal(discount)
+    if discount:
+        # the discount lowers each item's price, so VAT is still calculated per rate on what is actually paid
+        items = [
+            (name, (_to_price(price) * (1 - discount)).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP), vat_percent)
+            for name, price, vat_percent in items
+        ]
+        discounted_subtotal = sum(price for _name, price, _vat_percent in items)
+        lines.append(_receipt_line(f"Rabatt {_format_rate(discount * 100)} %", discounted_subtotal - subtotal))
+        subtotal = discounted_subtotal
+
     lines.append(_receipt_line("Summa exkl. moms", subtotal))
 
     total = subtotal
@@ -182,7 +205,8 @@ def items_from_inventory(shopping_list):
 if __name__ == "__main__":
     print("Available items: " + ", ".join(INVENTORY))
     shopping_list = input("Enter your shopping list as item names separated by commas (e.g. mjölk, bröd, bok): ")
-    print(format_receipt(items_from_inventory(shopping_list)))
+    discount_code = input("Enter a discount code (or press Enter to skip): ")
+    print(format_receipt(items_from_inventory(shopping_list), lookup_discount(discount_code)))
 
 
 """

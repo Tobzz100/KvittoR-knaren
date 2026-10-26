@@ -33,6 +33,16 @@ class TestDiscountCode(unittest.TestCase):
         self.assertEqual(result, 125)
         self.assertIn("Discount code 'FINNSINTE' does not exist, no discount applied", out.getvalue())
 
+    def test_lookup_discount_returns_rate_for_known_code(self):
+        self.assertEqual(kvitto.lookup_discount("RABATT10"), 0.10)
+
+    def test_lookup_discount_returns_zero_for_missing_or_unknown_code(self):
+        with redirect_stdout(io.StringIO()) as out:
+            for code in (None, "", "FINNSINTE"):
+                with self.subTest(code=code):
+                    self.assertEqual(kvitto.lookup_discount(code), 0)
+        self.assertEqual(out.getvalue().count("does not exist"), 1)
+
     def test_valid_or_missing_discount_code_prints_no_message(self):
         for code in ("RABATT10", None, ""):
             with self.subTest(code=code):
@@ -130,6 +140,33 @@ class TestFormatReceipt(unittest.TestCase):
             "Moms 12 %                 12,00",
             "Moms 6 %                   6,00",
         ])
+
+    def test_discount_is_shown_and_vat_is_calculated_on_discounted_prices(self):
+        # -10 %: kaffe 100 -> 90, bröd 50 -> 45; moms 90 * 25 % = 22,50 och 45 * 12 % = 5,40
+        receipt = kvitto.format_receipt([("Kaffe", 100, 25), ("Bröd", 50, 12)], 0.10)
+        self.assertIn("\n".join([
+            "-------------------------------",
+            "Rabatt 10 %              -15,00",
+            "Summa exkl. moms         135,00",
+            "Moms 25 %                 22,50",
+            "Moms 12 %                  5,40",
+            "-------------------------------",
+            "ATT BETALA               162,90",
+        ]), receipt)
+
+    def test_item_lines_show_prices_before_discount(self):
+        receipt = kvitto.format_receipt([("Kaffe", 100, 25)], 0.10)
+        self.assertIn("Kaffe                    100,00", receipt)
+
+    def test_discounted_prices_are_rounded_to_ore_so_the_receipt_adds_up(self):
+        # 19,95 * 0,9 = 17,955 -> 17,96, rabatten blir alltså 1,99 och inte 1,995
+        receipt = kvitto.format_receipt([("Godis", 19.95, 12)], 0.10)
+        self.assertIn("Rabatt 10 %               -1,99", receipt)
+        self.assertIn("Summa exkl. moms          17,96", receipt)
+
+    def test_no_discount_line_without_discount(self):
+        self.assertNotIn("Rabatt", kvitto.format_receipt([("Kaffe", 100, 25)]))
+        self.assertNotIn("Rabatt", kvitto.format_receipt([("Kaffe", 100, 25)], 0))
 
     def test_amounts_use_decimal_comma_and_two_decimals(self):
         receipt = kvitto.format_receipt([("Godis", 19.9, 12)])
@@ -265,9 +302,9 @@ class TestInventory(unittest.TestCase):
 class TestCliReceipt(unittest.TestCase):
     """__main__ lists the inventory and prints a receipt with each item's VAT rate from INVENTORY."""
 
-    def run_cli(self, shopping_list):
+    def run_cli(self, shopping_list, discount_code=""):
         output = io.StringIO()
-        with patch("builtins.input", side_effect=[shopping_list]):
+        with patch("builtins.input", side_effect=[shopping_list, discount_code]):
             with redirect_stdout(output):
                 runpy.run_path(MODULE_PATH, run_name="__main__")
         return output.getvalue()
@@ -296,6 +333,27 @@ class TestCliReceipt(unittest.TestCase):
             "ATT BETALA               253,80",
         ])
         self.assertIn(expected, output)
+
+    def test_cli_applies_discount_code(self):
+        # -10 %: mjölk 13,50, bok 180,00, tvål 18,00 = 211,50; moms 4,50 + 1,62 + 10,80 = 16,92
+        output = self.run_cli("mjölk, bok, tvål", "RABATT10")
+        expected = "\n".join([
+            "-------------------------------",
+            "Rabatt 10 %              -23,50",
+            "Summa exkl. moms         211,50",
+            "Moms 25 %                  4,50",
+            "Moms 12 %                  1,62",
+            "Moms 6 %                  10,80",
+            "-------------------------------",
+            "ATT BETALA               228,42",
+        ])
+        self.assertIn(expected, output)
+
+    def test_cli_unknown_discount_code_prints_message_and_charges_full_price(self):
+        output = self.run_cli("mjölk, bok, tvål", "FINNSINTE")
+        self.assertIn("Discount code 'FINNSINTE' does not exist, no discount applied", output)
+        self.assertNotIn("Rabatt", output)
+        self.assertIn("ATT BETALA               253,80", output)
 
     def test_cli_skips_unknown_items(self):
         output = self.run_cli("mjölk, guld")
