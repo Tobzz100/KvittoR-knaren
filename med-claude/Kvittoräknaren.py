@@ -145,13 +145,44 @@ def format_receipt(items):
     return "\n".join(lines)
 
 
-DEFAULT_VAT_PERCENT = 25
+# Varor som går att köpa: namn -> (pris exkl. moms i SEK, momssats i procent).
+# Pris och moms kommer bara härifrån, så kunden kan inte själv ange ett lägre pris eller momssats.
+INVENTORY = {
+    "Mjölk": (15, 12),
+    "Bröd": (30, 12),
+    "Ägg": (40, 12),
+    "Kaffe": (70, 12),
+    "Tvål": (20, 25),
+    "Batterier": (80, 25),
+    "Bok": (200, 6),
+    "Tidning": (40, 6),
+}
+
+
+def items_from_inventory(shopping_list):
+    """Look up comma-separated item names in INVENTORY and return (name, price, VAT rate) tuples.
+
+    Names are matched case-insensitively; unknown items are skipped with a printed warning.
+    """
+    inventory_by_lower_name = {name.lower(): name for name in INVENTORY}
+    items = []
+    for raw in shopping_list.split(","):
+        raw = raw.strip()
+        if not raw:
+            continue
+        name = inventory_by_lower_name.get(raw.lower())
+        if name is None:
+            print(f"Skipping unknown item: '{raw}'")
+            continue
+        price, vat_percent = INVENTORY[name]
+        items.append((name, price, vat_percent))
+    return items
 
 
 if __name__ == "__main__":
-    shopping_list = input("Enter your shopping list as 'item price currency' pairs separated by commas (e.g. milk 10 SEK, bread 20 EUR, eggs 15): ")
-    items = [(name, price_sek, DEFAULT_VAT_PERCENT) for name, price_sek in parse_shopping_list(shopping_list)]
-    print(format_receipt(items))
+    print("Available items: " + ", ".join(INVENTORY))
+    shopping_list = input("Enter your shopping list as item names separated by commas (e.g. mjölk, bröd, bok): ")
+    print(format_receipt(items_from_inventory(shopping_list)))
 
 
 """

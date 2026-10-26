@@ -224,8 +224,46 @@ class TestInvalidPrices(unittest.TestCase):
         self.assertEqual(kvitto.vat_breakdown([("Gratisprov", 0, 25)]), {25: Decimal("0.00")})
 
 
+class TestInventory(unittest.TestCase):
+    """items_from_inventory() takes price and VAT rate from INVENTORY, never from the input."""
+
+    def test_known_items_get_price_and_vat_rate_from_inventory(self):
+        self.assertEqual(
+            kvitto.items_from_inventory("Mjölk, Bok, Tvål"),
+            [("Mjölk", 15, 12), ("Bok", 200, 6), ("Tvål", 20, 25)],
+        )
+
+    def test_names_are_matched_case_insensitively_and_trimmed(self):
+        self.assertEqual(kvitto.items_from_inventory("  mjölk ,BRÖD"), [("Mjölk", 15, 12), ("Bröd", 30, 12)])
+
+    def test_same_item_twice_gives_two_lines(self):
+        self.assertEqual(kvitto.items_from_inventory("kaffe, kaffe"), [("Kaffe", 70, 12), ("Kaffe", 70, 12)])
+
+    def test_unknown_item_is_skipped_with_warning(self):
+        with redirect_stdout(io.StringIO()) as out:
+            items = kvitto.items_from_inventory("mjölk, guld")
+        self.assertEqual(items, [("Mjölk", 15, 12)])
+        self.assertIn("Skipping unknown item: 'guld'", out.getvalue())
+
+    def test_customer_cannot_set_own_price_or_vat_rate(self):
+        # "tvål 1" or "tvål 0%" is not an inventory name, so it is skipped instead of getting a lower price or rate
+        with redirect_stdout(io.StringIO()) as out:
+            items = kvitto.items_from_inventory("tvål 1, tvål 0%")
+        self.assertEqual(items, [])
+        self.assertEqual(out.getvalue().count("Skipping unknown item"), 2)
+
+    def test_empty_list_gives_no_items(self):
+        self.assertEqual(kvitto.items_from_inventory(""), [])
+
+    def test_every_inventory_item_has_valid_price_and_vat_rate(self):
+        for name, (price, vat_percent) in kvitto.INVENTORY.items():
+            with self.subTest(name=name):
+                self.assertIn(vat_percent, kvitto.VAT_RATES)
+                self.assertGreaterEqual(price, 0)
+
+
 class TestCliReceipt(unittest.TestCase):
-    """__main__ prints a receipt with 25 % moms on every item, prices converted to SEK."""
+    """__main__ lists the inventory and prints a receipt with each item's VAT rate from INVENTORY."""
 
     def run_cli(self, shopping_list):
         output = io.StringIO()
@@ -238,20 +276,31 @@ class TestCliReceipt(unittest.TestCase):
         parsed = kvitto.parse_shopping_list("milk 10 SEK, bred 25 EUR, eggs 12, trasig xyz")
         self.assertEqual(parsed, [("milk", 10.0), ("bred", 287.5), ("eggs", 12.0)])
 
-    def test_cli_prints_receipt_with_25_percent_moms(self):
-        output = self.run_cli("milk 10 SEK, bred 25 EUR, eggs 12")
+    def test_cli_lists_available_items(self):
+        self.assertIn("Available items: Mjölk, Bröd, Ägg, Kaffe, Tvål, Batterier, Bok, Tidning", self.run_cli(""))
+
+    def test_cli_prints_receipt_with_inventory_vat_rates(self):
+        # 15 * 12 % = 1,80; 200 * 6 % = 12,00; 20 * 25 % = 5,00; 235 + 18,80 = 253,80
+        output = self.run_cli("mjölk, bok, tvål")
         expected = "\n".join([
             "KVITTO",
-            "milk                      10,00",
-            "bred                     287,50",
-            "eggs                      12,00",
+            "Mjölk                     15,00",
+            "Bok                      200,00",
+            "Tvål                      20,00",
             "-------------------------------",
-            "Summa exkl. moms         309,50",
-            "Moms 25 %                 77,38",
+            "Summa exkl. moms         235,00",
+            "Moms 25 %                  5,00",
+            "Moms 12 %                  1,80",
+            "Moms 6 %                  12,00",
             "-------------------------------",
-            "ATT BETALA               386,88",
+            "ATT BETALA               253,80",
         ])
         self.assertIn(expected, output)
+
+    def test_cli_skips_unknown_items(self):
+        output = self.run_cli("mjölk, guld")
+        self.assertIn("Skipping unknown item: 'guld'", output)
+        self.assertIn("ATT BETALA                16,80", output)
 
     def test_cli_with_empty_list_prints_inga_varor(self):
         self.assertIn("Inga varor", self.run_cli(""))
